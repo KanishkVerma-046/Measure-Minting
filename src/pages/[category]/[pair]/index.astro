@@ -9,7 +9,7 @@ import FaqAccordion from "../../../components/FaqAccordion.astro";
 import RelatedConversions from "../../../components/RelatedConversions.astro";
 import JsonLd from "../../../components/JsonLd.astro";
 import { CATEGORIES, getUnit, describeConversion, formatNumber } from "../../../lib/units";
-import { categoryPath, pairPath } from "../../../lib/paths";
+import { categoryPath, pairPath, pairToLinkItem } from "../../../lib/paths";
 import { breadcrumbJsonLd, faqJsonLd } from "../../../lib/seo";
 
 export function getStaticPaths() {
@@ -61,10 +61,7 @@ const relatedPairs = category.popularPairs
       (p.from === fromUnit.id || p.to === fromUnit.id || p.from === toUnit.id || p.to === toUnit.id),
   )
   .slice(0, 8)
-  .map((p: { from: string; to: string }) => ({
-    label: `${getUnit(category, p.from)!.name} to ${getUnit(category, p.to)!.name}`,
-    path: pairPath(category.id, p.from, p.to),
-  }));
+  .map((p: { from: string; to: string }) => pairToLinkItem(category, p));
 ---
 
 <BaseLayout title={title} description={description} path={path}>

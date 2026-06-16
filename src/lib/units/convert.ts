@@ -21,6 +21,13 @@ export function convert(categoryId: string, fromUnitId: string, toUnitId: string
  * generically from two sample points rather than hand-written per category.
  * Works for both linear conversions (offset ~ 0, e.g. meters → feet) and
  * affine ones (e.g. Celsius → Fahrenheit).
+ *
+ * Assumes every UnitDef's toBase/fromBase composes into an affine function.
+ * That holds for all unit types here (and for any real-world measurement
+ * unit conversion), but if a future category ever needs a non-affine
+ * transform (e.g. a logarithmic scale like decibels), this two-point probe
+ * would produce a misleading "formula" — such a unit would need its own
+ * hand-written description rather than this generic derivation.
  */
 export function describeConversion(categoryId: string, fromUnitId: string, toUnitId: string) {
   const offset = convert(categoryId, fromUnitId, toUnitId, 0);

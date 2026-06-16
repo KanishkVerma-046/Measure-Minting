@@ -31,12 +31,12 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
       <div class="flex gap-xs">
         <input
           id={`${fieldId}-from-value`}
+          name={`${fieldId}-from-value`}
           data-role="from-value"
           type="text"
           inputmode="decimal"
           autocomplete="off"
           value={roundForInput(value)}
-          aria-label="Value to convert"
           class="h-12 w-full min-w-0 rounded-sm border border-hairline bg-canvas px-sm text-body-md text-ink focus-visible:border-ink"
         />
         <select
@@ -72,12 +72,12 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
       <div class="flex gap-xs">
         <input
           id={`${fieldId}-to-value`}
+          name={`${fieldId}-to-value`}
           data-role="to-value"
           type="text"
           inputmode="decimal"
           autocomplete="off"
           value={roundForInput(initialResult)}
-          aria-label="Converted value"
           class="h-12 w-full min-w-0 rounded-sm border border-hairline bg-canvas px-sm text-body-md text-ink focus-visible:border-ink"
         />
         <select
@@ -143,8 +143,10 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
             if (Number.isNaN(parsed)) return;
             fromValue.value = roundForInput(convert(categoryId!, toId, fromId, parsed));
           }
-        } catch {
-          // unknown unit combination — leave fields as-is
+        } catch (error) {
+          // Unexpected — getCategory/getUnit lookups above should make this
+          // unreachable, but don't fail silently if a future edit breaks that.
+          console.error("UnitConverter: conversion failed", error);
         }
       };
 

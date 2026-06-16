@@ -10,6 +10,12 @@ import type { UnitPair } from "./types";
  * unit against every other low-traffic unit.
  */
 export function buildAnchoredPairs(unitIds: string[], anchorIds: string[]): UnitPair[] {
+  for (const anchor of anchorIds) {
+    if (!unitIds.includes(anchor)) {
+      throw new Error(`buildAnchoredPairs: anchor "${anchor}" is not a known unit id (typo?)`);
+    }
+  }
+
   const seen = new Set<string>();
   const pairs: UnitPair[] = [];
 

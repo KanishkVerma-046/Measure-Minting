@@ -2,8 +2,8 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import JsonLd from "../../components/JsonLd.astro";
-import { CATEGORIES, getUnit } from "../../lib/units";
-import { categoryPath, pairPath } from "../../lib/paths";
+import { CATEGORIES } from "../../lib/units";
+import { categoryPath, pairToLinkItem } from "../../lib/paths";
 import { breadcrumbJsonLd } from "../../lib/seo";
 
 const path = "/all-converters/";
@@ -41,14 +41,13 @@ const breadcrumbItems = [
               <p class="mt-xxs text-body-md text-body">{category.description}</p>
               <div class="mt-sm flex flex-wrap gap-xs">
                 {category.popularPairs.map((pair: { from: string; to: string }) => {
-                  const fromUnit = getUnit(category, pair.from)!;
-                  const toUnit = getUnit(category, pair.to)!;
+                  const { label, path: pairHref } = pairToLinkItem(category, pair);
                   return (
                     <a
-                      href={pairPath(category.id, pair.from, pair.to)}
+                      href={pairHref}
                       class="rounded-full border border-hairline bg-canvas px-sm py-1 text-body-sm text-body transition-colors hover:bg-canvas-soft hover:text-ink"
                     >
-                      {fromUnit.name} to {toUnit.name}
+                      {label}
                     </a>
                   );
                 })}

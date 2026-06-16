@@ -18,7 +18,9 @@ const { title, description, path } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fafafa" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/Geist-Variable.woff2" crossorigin="anonymous" />
     <meta name="generator" content={Astro.generator} />
     <Seo title={title} description={description} path={path} />
     <slot name="head" />

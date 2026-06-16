@@ -201,4 +201,24 @@
     outline-offset: 2px;
     border-radius: var(--radius-xs);
   }
+
+  /* Faster tap response on touch devices — no double-tap-to-zoom delay */
+  a,
+  button,
+  select,
+  summary {
+    touch-action: manipulation;
+  }
+
+  /* Respect reduced-motion preference site-wide rather than per-component */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

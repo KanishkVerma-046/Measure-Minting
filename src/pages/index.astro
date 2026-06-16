@@ -5,8 +5,8 @@ import Card from "../components/Card.astro";
 import Button from "../components/Button.astro";
 import Badge from "../components/Badge.astro";
 import UnitConverter from "../components/UnitConverter.astro";
-import { CATEGORIES, getUnit } from "../lib/units";
-import { categoryPath, pairPath } from "../lib/paths";
+import { CATEGORIES } from "../lib/units";
+import { categoryPath, pairToLinkItem } from "../lib/paths";
 
 const featuredPairs = [
   { categoryId: "length", from: "meters", to: "feet" },
@@ -17,12 +17,7 @@ const featuredPairs = [
   { categoryId: "speed", from: "kilometers-per-hour", to: "miles-per-hour" },
 ].map(({ categoryId, from, to }) => {
   const category = CATEGORIES.find((c) => c.id === categoryId)!;
-  const fromUnit = getUnit(category, from)!;
-  const toUnit = getUnit(category, to)!;
-  return {
-    label: `${fromUnit.name} to ${toUnit.name}`,
-    path: pairPath(categoryId, from, to),
-  };
+  return pairToLinkItem(category, { from, to });
 });
 
 const features = [

@@ -26,10 +26,10 @@ const { categoryId, fromUnitId, toUnitId, fromSymbol, toSymbol } = Astro.props;
       {
         REFERENCE_VALUES.map((value) => (
           <tr class="border-t border-hairline">
-            <td class="px-sm py-xs text-body-sm text-ink">
+            <td class="px-sm py-xs text-body-sm text-ink tabular-nums">
               {value} {fromSymbol}
             </td>
-            <td class="px-sm py-xs text-body-sm text-ink">
+            <td class="px-sm py-xs text-body-sm text-ink tabular-nums">
               {formatNumber(convert(categoryId, fromUnitId, toUnitId, value))} {toSymbol}
             </td>
           </tr>
