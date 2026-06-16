@@ -1,0 +1,21 @@
+---
+// DESIGN.md `banner-marketing` — "Introducing X" style announcement pill
+interface Props {
+  href?: string;
+  class?: string;
+}
+
+const { href, class: className = "" } = Astro.props;
+const Tag = href ? "a" : "div";
+---
+
+<Tag
+  href={href}
+  class={[
+    "inline-flex items-center gap-xs bg-canvas-soft text-body text-body-sm rounded-full px-sm py-xs",
+    href ? "hover:text-ink transition-colors" : "",
+    className,
+  ].join(" ")}
+>
+  <slot />
+</Tag>

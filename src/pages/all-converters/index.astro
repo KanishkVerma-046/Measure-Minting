@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import JsonLd from "../../components/JsonLd.astro";
+import { CATEGORIES, getUnit } from "../../lib/units";
+import { categoryPath, pairPath } from "../../lib/paths";
+import { breadcrumbJsonLd } from "../../lib/seo";
+
+const path = "/all-converters/";
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: "All Converters", path },
+];
+---
+
+<BaseLayout
+  title="All Converters"
+  description="Browse every unit conversion category and conversion pair on MeasureMinting."
+  path={path}
+>
+  <JsonLd data={breadcrumbJsonLd(breadcrumbItems)} />
+
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h1 class="text-display-xl text-ink">All converters</h1>
+      <p class="mt-sm max-w-[60ch] text-body-lg text-body">
+        Every conversion category and curated unit pair on MeasureMinting, in one place.
+      </p>
+
+      <div class="mt-3xl flex flex-col gap-3xl">
+        {
+          CATEGORIES.map((category) => (
+            <div>
+              <a href={categoryPath(category.id)} class="text-display-md text-ink hover:underline">
+                {category.label}
+              </a>
+              <p class="mt-xxs text-body-md text-body">{category.description}</p>
+              <div class="mt-sm flex flex-wrap gap-xs">
+                {category.popularPairs.map((pair: { from: string; to: string }) => {
+                  const fromUnit = getUnit(category, pair.from)!;
+                  const toUnit = getUnit(category, pair.to)!;
+                  return (
+                    <a
+                      href={pairPath(category.id, pair.from, pair.to)}
+                      class="rounded-full border border-hairline bg-canvas px-sm py-1 text-body-sm text-body transition-colors hover:bg-canvas-soft hover:text-ink"
+                    >
+                      {fromUnit.name} to {toUnit.name}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

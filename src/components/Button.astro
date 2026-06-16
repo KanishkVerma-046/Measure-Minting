@@ -1,0 +1,28 @@
+---
+// Marketing-scale pill CTA — DESIGN.md `button-primary` / `button-secondary`
+// (+ `-sm` variants). For nav-scale square buttons see NavBar.astro directly.
+interface Props {
+  variant?: "primary" | "secondary";
+  size?: "lg" | "sm";
+  href?: string;
+  type?: "button" | "submit";
+  class?: string;
+}
+
+const { variant = "primary", size = "lg", href, type = "button", class: className = "" } = Astro.props;
+
+const base = "inline-flex items-center justify-center gap-xs rounded-pill transition-opacity hover:opacity-90";
+
+const variantClasses =
+  variant === "primary" ? "bg-primary text-on-primary" : "bg-canvas text-ink border border-hairline";
+
+const sizeClasses = size === "lg" ? "text-button-lg px-lg py-sm" : "text-button-md px-md py-xs";
+
+const classes = [base, variantClasses, sizeClasses, className].join(" ");
+
+const Tag = href ? "a" : "button";
+---
+
+<Tag class={classes} href={href} type={href ? undefined : type}>
+  <slot />
+</Tag>

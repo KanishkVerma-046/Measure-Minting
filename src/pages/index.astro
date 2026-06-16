@@ -1,11 +1,119 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import Card from "../components/Card.astro";
+import Button from "../components/Button.astro";
+import Badge from "../components/Badge.astro";
+import UnitConverter from "../components/UnitConverter.astro";
+import { CATEGORIES, getUnit } from "../lib/units";
+import { categoryPath, pairPath } from "../lib/paths";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const featuredPairs = [
+  { categoryId: "length", from: "meters", to: "feet" },
+  { categoryId: "temperature", from: "celsius", to: "fahrenheit" },
+  { categoryId: "weight-and-mass", from: "pounds", to: "kilograms" },
+  { categoryId: "volume", from: "liters", to: "gallons" },
+  { categoryId: "area", from: "square-meters", to: "square-feet" },
+  { categoryId: "speed", from: "kilometers-per-hour", to: "miles-per-hour" },
+].map(({ categoryId, from, to }) => {
+  const category = CATEGORIES.find((c) => c.id === categoryId)!;
+  const fromUnit = getUnit(category, from)!;
+  const toUnit = getUnit(category, to)!;
+  return {
+    label: `${fromUnit.name} to ${toUnit.name}`,
+    path: pairPath(categoryId, from, to),
+  };
+});
+
+const features = [
+  {
+    title: "Instant & accurate",
+    body: "Type in either field and watch the result update live — no \"Convert\" button, no page reload.",
+  },
+  {
+    title: "Zero ads, zero trackers",
+    body: "No banner clutter, no pop-ups, no third-party scripts slowing things down. Just the tool.",
+  },
+  {
+    title: "Built for every device",
+    body: "Fast, accessible, and fully responsive — keyboard-friendly from the first tab stop.",
+  },
+];
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout
+  title="MeasureMinting — Free Online Unit Converter"
+  description="Convert length, weight, temperature, volume, area, and speed instantly. Fast, accurate, ad-free unit conversion."
+  path="/"
+>
+  <Hero>
+    <Fragment slot="badge">
+      <Badge>Now converting 6 categories, 50+ units</Badge>
+    </Fragment>
+    <Fragment slot="title">Convert any unit, instantly.</Fragment>
+    <Fragment slot="subtitle">
+      The fast, ad-free unit converter for length, weight, temperature, volume, area, and speed.
+    </Fragment>
+    <Fragment slot="actions">
+      <Button href="/all-converters/" variant="primary">Browse all converters</Button>
+      <Button href="/length/" variant="secondary">Start with Length</Button>
+    </Fragment>
+
+    <Card variant="marketing-large" class="mx-auto max-w-2xl text-left">
+      <UnitConverter categoryId="length" fromUnitId="meters" toUnitId="feet" value={1} />
+    </Card>
+  </Hero>
+
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <h2 class="text-display-lg text-ink">Browse by category</h2>
+      <div class="mt-lg grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-3">
+        {
+          CATEGORIES.map((category) => (
+            <a href={categoryPath(category.id)}>
+              <Card variant="marketing" class="h-full transition-shadow hover:shadow-level-4">
+                <h3 class="text-display-sm text-ink">{category.label}</h3>
+                <p class="mt-xs text-body-md text-body">{category.description}</p>
+                <p class="mt-sm text-body-sm-strong text-link">{category.units.length} units →</p>
+              </Card>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-canvas-soft px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <h2 class="text-display-lg text-ink">Popular conversions</h2>
+      <div class="mt-lg flex flex-wrap gap-sm">
+        {
+          featuredPairs.map((pair) => (
+            <a
+              href={pair.path}
+              class="rounded-full border border-hairline bg-canvas px-md py-xs text-body-sm-strong text-ink transition-colors hover:bg-canvas-soft"
+            >
+              {pair.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="px-md py-5xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <h2 class="text-center text-display-lg text-ink">Why MeasureMinting</h2>
+      <div class="mt-2xl grid grid-cols-1 gap-lg sm:grid-cols-3">
+        {
+          features.map((feature) => (
+            <div>
+              <h3 class="text-display-sm text-ink">{feature.title}</h3>
+              <p class="mt-xs text-body-md text-body">{feature.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

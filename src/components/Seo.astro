@@ -1,0 +1,28 @@
+---
+import { SITE_NAME, SITE_URL } from "../lib/seo";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Absolute path, e.g. "/length/meters-to-feet/" */
+  path: string;
+}
+
+const { title, description, path } = Astro.props;
+const canonicalUrl = `${SITE_URL}${path}`;
+const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />

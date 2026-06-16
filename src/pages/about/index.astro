@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+const path = "/about/";
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: "About", path },
+];
+---
+
+<BaseLayout
+  title="About"
+  description="MeasureMinting is a fast, ad-free unit converter built for accuracy and speed."
+  path={path}
+>
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-2xl">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h1 class="text-display-xl text-ink">About MeasureMinting</h1>
+      <p class="mt-md text-body-lg text-body">
+        MeasureMinting is a unit converter built around one idea: the tool should get out of your way. Type a
+        number, pick your units, and get an accurate answer instantly — no ads, no pop-ups, no page reloads.
+      </p>
+      <p class="mt-md text-body-md text-body">
+        Every conversion factor used on this site is sourced from internationally defined standards (SI, US
+        customary, and imperial units). Results are computed live in your browser using the same conversion
+        engine that generates every static page on the site, so the math you see is always consistent.
+      </p>
+      <p class="mt-md text-body-md text-body">
+        We're starting with six core categories — Length, Weight & Mass, Temperature, Volume, Area, and Speed —
+        and adding more over time.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

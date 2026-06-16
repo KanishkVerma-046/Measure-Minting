@@ -1,0 +1,25 @@
+---
+// DESIGN.md `form-input` / `form-input-sm` / `form-input-lg`
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"input"> {
+  size?: "default" | "sm" | "lg";
+}
+
+const { size = "default", class: className = "", ...rest } = Astro.props;
+
+const sizeClasses = {
+  sm: "h-8 text-body-sm",
+  default: "h-10 text-body-sm",
+  lg: "h-12 text-body-md",
+}[size];
+---
+
+<input
+  class={[
+    "w-full bg-canvas text-ink border border-hairline rounded-sm px-sm focus-visible:border-ink",
+    sizeClasses,
+    className,
+  ].join(" ")}
+  {...rest}
+/>

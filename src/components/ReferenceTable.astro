@@ -1,0 +1,40 @@
+---
+// A short, curated reference table (nice round numbers) — not the
+// brute-force 1..1000 row dumps the competitor uses.
+import { REFERENCE_VALUES, convert, formatNumber } from "../lib/units";
+
+interface Props {
+  categoryId: string;
+  fromUnitId: string;
+  toUnitId: string;
+  fromSymbol: string;
+  toSymbol: string;
+}
+
+const { categoryId, fromUnitId, toUnitId, fromSymbol, toSymbol } = Astro.props;
+---
+
+<div class="overflow-hidden rounded-md border border-hairline">
+  <table class="w-full text-left">
+    <thead class="bg-canvas-soft">
+      <tr>
+        <th class="px-sm py-xs text-caption-mono uppercase text-mute">{fromSymbol}</th>
+        <th class="px-sm py-xs text-caption-mono uppercase text-mute">{toSymbol}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        REFERENCE_VALUES.map((value) => (
+          <tr class="border-t border-hairline">
+            <td class="px-sm py-xs text-body-sm text-ink">
+              {value} {fromSymbol}
+            </td>
+            <td class="px-sm py-xs text-body-sm text-ink">
+              {formatNumber(convert(categoryId, fromUnitId, toUnitId, value))} {toSymbol}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

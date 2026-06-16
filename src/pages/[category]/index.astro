@@ -1,0 +1,84 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import Card from "../../components/Card.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import UnitConverter from "../../components/UnitConverter.astro";
+import JsonLd from "../../components/JsonLd.astro";
+import { CATEGORIES, getUnit } from "../../lib/units";
+import { categoryPath, pairPath } from "../../lib/paths";
+import { breadcrumbJsonLd } from "../../lib/seo";
+
+export function getStaticPaths() {
+  return CATEGORIES.map((category) => ({
+    params: { category: category.id },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+const path = categoryPath(category.id);
+
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: category.label, path },
+];
+
+const defaultFrom = category.units[0];
+const defaultTo = category.units[1] ?? category.units[0];
+---
+
+<BaseLayout
+  title={`${category.label} Converter`}
+  description={category.description}
+  path={path}
+>
+  <JsonLd data={breadcrumbJsonLd(breadcrumbItems)} />
+
+  <Hero compact>
+    <Fragment slot="title">{category.label} Converter</Fragment>
+    <Fragment slot="subtitle">{category.description}</Fragment>
+
+    <Card variant="marketing-large" class="mx-auto max-w-2xl text-left">
+      <UnitConverter categoryId={category.id} fromUnitId={defaultFrom.id} toUnitId={defaultTo.id} value={1} />
+    </Card>
+  </Hero>
+
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h2 class="text-display-lg text-ink">Popular {category.label.toLowerCase()} conversions</h2>
+      <div class="mt-lg flex flex-wrap gap-sm">
+        {
+          category.popularPairs.map((pair: { from: string; to: string }) => {
+            const fromUnit = getUnit(category, pair.from)!;
+            const toUnit = getUnit(category, pair.to)!;
+            return (
+              <a
+                href={pairPath(category.id, pair.from, pair.to)}
+                class="rounded-full border border-hairline bg-canvas px-md py-xs text-body-sm-strong text-ink transition-colors hover:bg-canvas-soft"
+              >
+                {fromUnit.name} to {toUnit.name}
+              </a>
+            );
+          })
+        }
+      </div>
+
+      <h2 class="mt-4xl text-display-lg text-ink">All {category.label.toLowerCase()} units</h2>
+      <div class="mt-lg grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-4">
+        {
+          category.units.map((unit: { id: string; name: string; symbol: string }) => (
+            <div class="rounded-md border border-hairline bg-canvas px-sm py-xs">
+              <p class="text-body-sm-strong text-ink">{unit.name}</p>
+              <p class="text-caption-mono text-mute">{unit.symbol}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

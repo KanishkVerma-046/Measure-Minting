@@ -1,0 +1,12 @@
+---
+// DESIGN.md `badge-secondary`
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<span class={["inline-flex items-center bg-canvas-soft text-body text-caption rounded-full px-xs py-[3px]", className].join(" ")}>
+  <slot />
+</span>

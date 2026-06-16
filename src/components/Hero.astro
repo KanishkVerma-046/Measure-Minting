@@ -1,0 +1,30 @@
+---
+// DESIGN.md `hero-band` (full) / `feature-mesh-band` (compact, for hub pages)
+import MeshGradient from "./MeshGradient.astro";
+
+interface Props {
+  compact?: boolean;
+  class?: string;
+}
+
+const { compact = false, class: className = "" } = Astro.props;
+---
+
+<section class={["relative overflow-hidden bg-canvas", compact ? "px-md py-5xl sm:px-lg" : "px-md py-section sm:px-lg", className].join(" ")}>
+  <MeshGradient />
+  <div class="relative mx-auto max-w-[1400px] text-center">
+    <slot name="badge" />
+    <h1 class={compact ? "mt-md text-display-lg text-ink" : "mt-lg text-display-xl text-ink"}>
+      <slot name="title" />
+    </h1>
+    <p class="mx-auto mt-sm max-w-[60ch] text-body-lg text-body">
+      <slot name="subtitle" />
+    </p>
+    <div class="mt-lg flex flex-wrap items-center justify-center gap-sm">
+      <slot name="actions" />
+    </div>
+    <div class="mt-2xl">
+      <slot />
+    </div>
+  </div>
+</section>

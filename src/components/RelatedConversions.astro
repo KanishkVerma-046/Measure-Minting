@@ -1,0 +1,26 @@
+---
+interface Props {
+  title: string;
+  items: { label: string; path: string }[];
+}
+
+const { title, items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <div>
+      <h2 class="text-display-sm text-ink">{title}</h2>
+      <div class="mt-sm flex flex-wrap gap-sm">
+        {items.map((item) => (
+          <a
+            href={item.path}
+            class="rounded-full border border-hairline bg-canvas px-md py-xs text-body-sm-strong text-ink transition-colors hover:bg-canvas-soft"
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}

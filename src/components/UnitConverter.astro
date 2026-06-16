@@ -1,0 +1,183 @@
+---
+// The site's core interactive primitive: a live, bidirectional, any-unit
+// converter. Used pre-filled on pair pages (SEO long-tail) and free-picking
+// on category hub pages / the homepage — same component, just different
+// default from/to units. Server-renders one real, correct conversion (works
+// and is crawlable with zero JS), then a tiny vanilla custom element hydrates
+// it for instant as-you-type recompute, a unit swap, and copy-to-clipboard.
+import { getCategory, convert, roundForInput } from "../lib/units";
+
+interface Props {
+  categoryId: string;
+  fromUnitId: string;
+  toUnitId: string;
+  value?: number;
+  class?: string;
+}
+
+const { categoryId, fromUnitId, toUnitId, value = 1, class: className = "" } = Astro.props;
+
+const category = getCategory(categoryId);
+if (!category) throw new Error(`Unknown category: ${categoryId}`);
+
+const initialResult = convert(categoryId, fromUnitId, toUnitId, value);
+const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
+---
+
+<unit-converter data-category={categoryId} class={["block", className].join(" ")}>
+  <div class="flex flex-col gap-sm md:flex-row md:items-end">
+    <div class="flex-1">
+      <label for={`${fieldId}-from-value`} class="mb-xxs block text-caption-mono uppercase text-mute">From</label>
+      <div class="flex gap-xs">
+        <input
+          id={`${fieldId}-from-value`}
+          data-role="from-value"
+          type="text"
+          inputmode="decimal"
+          autocomplete="off"
+          value={roundForInput(value)}
+          aria-label="Value to convert"
+          class="h-12 w-full min-w-0 rounded-sm border border-hairline bg-canvas px-sm text-body-md text-ink focus-visible:border-ink"
+        />
+        <select
+          data-role="from-unit"
+          aria-label="From unit"
+          class="h-12 shrink-0 rounded-sm border border-hairline bg-canvas px-sm text-body-sm text-ink focus-visible:border-ink"
+        >
+          {
+            category.units.map((unit) => (
+              <option value={unit.id} selected={unit.id === fromUnitId}>
+                {unit.name} ({unit.symbol})
+              </option>
+            ))
+          }
+        </select>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      data-role="swap"
+      aria-label="Swap units"
+      class="mx-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-hairline bg-canvas text-ink transition-transform hover:rotate-180 md:mb-px"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M7 10L3 6l4-4M3 6h13a4 4 0 0 1 4 4v1" />
+        <path d="M17 14l4 4-4 4M21 18H8a4 4 0 0 1-4-4v-1" />
+      </svg>
+    </button>
+
+    <div class="flex-1">
+      <label for={`${fieldId}-to-value`} class="mb-xxs block text-caption-mono uppercase text-mute">To</label>
+      <div class="flex gap-xs">
+        <input
+          id={`${fieldId}-to-value`}
+          data-role="to-value"
+          type="text"
+          inputmode="decimal"
+          autocomplete="off"
+          value={roundForInput(initialResult)}
+          aria-label="Converted value"
+          class="h-12 w-full min-w-0 rounded-sm border border-hairline bg-canvas px-sm text-body-md text-ink focus-visible:border-ink"
+        />
+        <select
+          data-role="to-unit"
+          aria-label="To unit"
+          class="h-12 shrink-0 rounded-sm border border-hairline bg-canvas px-sm text-body-sm text-ink focus-visible:border-ink"
+        >
+          {
+            category.units.map((unit) => (
+              <option value={unit.id} selected={unit.id === toUnitId}>
+                {unit.name} ({unit.symbol})
+              </option>
+            ))
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-sm flex items-center gap-xs">
+    <button
+      type="button"
+      data-role="copy"
+      class="inline-flex items-center gap-xs rounded-sm border border-hairline bg-canvas px-xs py-1 text-body-sm text-body transition-colors hover:text-ink"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="13" height="13" rx="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+      <span data-role="copy-label">Copy result</span>
+    </button>
+  </div>
+</unit-converter>
+
+<script>
+  import { getCategory, convert, roundForInput } from "../lib/units";
+
+  class UnitConverterElement extends HTMLElement {
+    connectedCallback() {
+      const categoryId = this.dataset.category;
+      const category = categoryId ? getCategory(categoryId) : undefined;
+      if (!category) return;
+
+      const fromValue = this.querySelector<HTMLInputElement>('[data-role="from-value"]');
+      const toValue = this.querySelector<HTMLInputElement>('[data-role="to-value"]');
+      const fromUnit = this.querySelector<HTMLSelectElement>('[data-role="from-unit"]');
+      const toUnit = this.querySelector<HTMLSelectElement>('[data-role="to-unit"]');
+      const swapBtn = this.querySelector<HTMLButtonElement>('[data-role="swap"]');
+      const copyBtn = this.querySelector<HTMLButtonElement>('[data-role="copy"]');
+      const copyLabel = this.querySelector('[data-role="copy-label"]');
+      if (!fromValue || !toValue || !fromUnit || !toUnit) return;
+
+      const recompute = (source: "from" | "to") => {
+        const fromId = fromUnit.value;
+        const toId = toUnit.value;
+        try {
+          if (source === "from") {
+            const parsed = parseFloat(fromValue.value);
+            if (Number.isNaN(parsed)) return;
+            toValue.value = roundForInput(convert(categoryId!, fromId, toId, parsed));
+          } else {
+            const parsed = parseFloat(toValue.value);
+            if (Number.isNaN(parsed)) return;
+            fromValue.value = roundForInput(convert(categoryId!, toId, fromId, parsed));
+          }
+        } catch {
+          // unknown unit combination — leave fields as-is
+        }
+      };
+
+      fromValue.addEventListener("input", () => recompute("from"));
+      toValue.addEventListener("input", () => recompute("to"));
+      fromUnit.addEventListener("change", () => recompute("from"));
+      toUnit.addEventListener("change", () => recompute("from"));
+
+      swapBtn?.addEventListener("click", () => {
+        [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
+        [fromValue.value, toValue.value] = [toValue.value, fromValue.value];
+      });
+
+      copyBtn?.addEventListener("click", async () => {
+        const unit = category.units.find((u) => u.id === toUnit.value);
+        const text = `${toValue.value} ${unit?.symbol ?? ""}`.trim();
+        try {
+          await navigator.clipboard.writeText(text);
+          if (copyLabel) {
+            const original = copyLabel.textContent;
+            copyLabel.textContent = "Copied!";
+            setTimeout(() => {
+              copyLabel.textContent = original;
+            }, 1500);
+          }
+        } catch {
+          // clipboard API unavailable — silently ignore
+        }
+      });
+    }
+  }
+
+  if (!customElements.get("unit-converter")) {
+    customElements.define("unit-converter", UnitConverterElement);
+  }
+</script>

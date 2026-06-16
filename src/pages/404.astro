@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/Button.astro";
+import { CATEGORIES } from "../lib/units";
+import { categoryPath } from "../lib/paths";
+---
+
+<BaseLayout title="Page Not Found" description="This page doesn't exist." path="/404/">
+  <section class="px-md py-section text-center sm:px-lg">
+    <div class="mx-auto max-w-xl">
+      <p class="text-caption-mono uppercase text-mute">404</p>
+      <h1 class="mt-xs text-display-xl text-ink">We couldn't find that conversion.</h1>
+      <p class="mt-sm text-body-lg text-body">
+        The page you're looking for doesn't exist — but the converter you need is probably one click away.
+      </p>
+      <div class="mt-lg flex flex-wrap items-center justify-center gap-sm">
+        <Button href="/" variant="primary">Go home</Button>
+        <Button href="/all-converters/" variant="secondary">Browse all converters</Button>
+      </div>
+      <div class="mt-2xl flex flex-wrap justify-center gap-xs">
+        {
+          CATEGORIES.map((category) => (
+            <a
+              href={categoryPath(category.id)}
+              class="rounded-full border border-hairline bg-canvas px-sm py-1 text-body-sm text-body hover:bg-canvas-soft hover:text-ink"
+            >
+              {category.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

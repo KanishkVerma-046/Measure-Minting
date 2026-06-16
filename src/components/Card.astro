@@ -1,0 +1,22 @@
+---
+// DESIGN.md `card-marketing` / `card-marketing-large` / `card-soft`
+interface Props {
+  variant?: "marketing" | "marketing-large" | "soft";
+  class?: string;
+  as?: "div" | "li" | "article";
+}
+
+const { variant = "marketing", class: className = "", as = "div" } = Astro.props;
+
+const variantClasses = {
+  marketing: "bg-canvas rounded-md p-lg shadow-level-3",
+  "marketing-large": "bg-canvas rounded-lg p-xl shadow-level-4",
+  soft: "bg-canvas-soft rounded-md p-lg shadow-level-1",
+}[variant];
+
+const Tag = as;
+---
+
+<Tag class={["text-ink", variantClasses, className].join(" ")}>
+  <slot />
+</Tag>

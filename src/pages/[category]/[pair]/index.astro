@@ -1,0 +1,122 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Hero from "../../../components/Hero.astro";
+import Card from "../../../components/Card.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import UnitConverter from "../../../components/UnitConverter.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+import FaqAccordion from "../../../components/FaqAccordion.astro";
+import RelatedConversions from "../../../components/RelatedConversions.astro";
+import JsonLd from "../../../components/JsonLd.astro";
+import { CATEGORIES, getUnit, describeConversion, formatNumber } from "../../../lib/units";
+import { categoryPath, pairPath } from "../../../lib/paths";
+import { breadcrumbJsonLd, faqJsonLd } from "../../../lib/seo";
+
+export function getStaticPaths() {
+  return CATEGORIES.flatMap((category) =>
+    category.popularPairs.map((pairDef) => ({
+      params: { category: category.id, pair: `${pairDef.from}-to-${pairDef.to}` },
+      props: { category, pairDef },
+    })),
+  );
+}
+
+const { category, pairDef } = Astro.props;
+const fromUnit = getUnit(category, pairDef.from)!;
+const toUnit = getUnit(category, pairDef.to)!;
+const path = pairPath(category.id, fromUnit.id, toUnit.id);
+
+const { factor, offset, isAffine } = describeConversion(category.id, fromUnit.id, toUnit.id);
+
+const title = `${fromUnit.name} to ${toUnit.name}`;
+const description = `Convert ${fromUnit.name} (${fromUnit.symbol}) to ${toUnit.name} (${toUnit.symbol}) instantly, with a formula, reference table, and FAQ.`;
+
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: category.label, path: categoryPath(category.id) },
+  { label: title, path },
+];
+
+const faqs = [
+  {
+    question: `How many ${toUnit.name} is one ${fromUnit.name}?`,
+    answer: `One ${fromUnit.name} (${fromUnit.symbol}) equals ${formatNumber(factor + offset)} ${toUnit.name} (${toUnit.symbol}).`,
+  },
+  {
+    question: `How do I convert ${fromUnit.name} to ${toUnit.name}?`,
+    answer: isAffine
+      ? `Multiply the value in ${fromUnit.name} by ${formatNumber(factor)}, then add ${formatNumber(offset)}, to get ${toUnit.name}.`
+      : `Multiply the value in ${fromUnit.name} by ${formatNumber(factor)} to get ${toUnit.name}.`,
+  },
+  {
+    question: `Is the ${fromUnit.name} to ${toUnit.name} conversion exact?`,
+    answer: `Yes — this converter uses the internationally defined conversion factor between ${fromUnit.name.toLowerCase()} and ${toUnit.name.toLowerCase()}, accurate to several decimal places.`,
+  },
+];
+
+const relatedPairs = category.popularPairs
+  .filter(
+    (p: { from: string; to: string }) =>
+      !(p.from === fromUnit.id && p.to === toUnit.id) &&
+      (p.from === fromUnit.id || p.to === fromUnit.id || p.from === toUnit.id || p.to === toUnit.id),
+  )
+  .slice(0, 8)
+  .map((p: { from: string; to: string }) => ({
+    label: `${getUnit(category, p.from)!.name} to ${getUnit(category, p.to)!.name}`,
+    path: pairPath(category.id, p.from, p.to),
+  }));
+---
+
+<BaseLayout title={title} description={description} path={path}>
+  <JsonLd data={[breadcrumbJsonLd(breadcrumbItems), faqJsonLd(faqs)]} />
+
+  <Hero compact>
+    <Fragment slot="title">{title}</Fragment>
+    <Fragment slot="subtitle">{description}</Fragment>
+
+    <Card variant="marketing-large" class="mx-auto max-w-2xl text-left">
+      <UnitConverter categoryId={category.id} fromUnitId={fromUnit.id} toUnitId={toUnit.id} value={1} />
+    </Card>
+  </Hero>
+
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-2xl">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h2 class="text-display-md text-ink">Formula</h2>
+      <p class="mt-xs text-body-md text-body">
+        {
+          isAffine
+            ? `${toUnit.name} = (${fromUnit.name} × ${formatNumber(factor)}) + ${formatNumber(offset)}`
+            : `${fromUnit.name} × ${formatNumber(factor)} = ${toUnit.name}`
+        }
+      </p>
+      <p class="mt-sm text-body-md text-body">
+        {fromUnit.name} ({fromUnit.symbol}) and {toUnit.name} ({toUnit.symbol}) are both units of {category.label.toLowerCase()}.
+        Use the converter above for any value, or check the quick-reference table below for common amounts.
+      </p>
+
+      <h2 class="mt-2xl text-display-md text-ink">Quick reference</h2>
+      <div class="mt-sm">
+        <ReferenceTable
+          categoryId={category.id}
+          fromUnitId={fromUnit.id}
+          toUnitId={toUnit.id}
+          fromSymbol={fromUnit.symbol}
+          toSymbol={toUnit.symbol}
+        />
+      </div>
+
+      <h2 class="mt-2xl text-display-md text-ink">Frequently asked questions</h2>
+      <div class="mt-sm">
+        <FaqAccordion faqs={faqs} />
+      </div>
+
+      <div class="mt-2xl">
+        <RelatedConversions title={`More ${category.label.toLowerCase()} conversions`} items={relatedPairs} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,19 @@
+---
+// DESIGN.md signature decoration: the brand's only atmospheric effect. Rendered
+// as layered, blurred CSS radial-gradients (no raster asset to maintain),
+// scaled fluidly to its container. Hero-scale use only — never miniaturize.
+---
+
+<div
+  aria-hidden="true"
+  class="pointer-events-none absolute inset-0 opacity-60 blur-[80px]"
+  style="background-image:
+      radial-gradient(at 15% 25%, var(--color-gradient-develop-start) 0, transparent 55%),
+      radial-gradient(at 85% 15%, var(--color-gradient-develop-end) 0, transparent 55%),
+      radial-gradient(at 75% 65%, var(--color-gradient-preview-start) 0, transparent 55%),
+      radial-gradient(at 25% 75%, var(--color-gradient-preview-end) 0, transparent 55%),
+      radial-gradient(at 90% 90%, var(--color-gradient-ship-start) 0, transparent 50%),
+      radial-gradient(at 10% 95%, var(--color-gradient-ship-end) 0, transparent 50%);"
+>
+</div>
+<div class="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent to-canvas"></div>

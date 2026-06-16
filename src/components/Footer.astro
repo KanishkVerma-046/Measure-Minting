@@ -1,0 +1,52 @@
+---
+import { CATEGORIES } from "../lib/units";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-hairline bg-canvas px-md py-4xl sm:px-lg">
+  <div class="mx-auto grid max-w-[1400px] grid-cols-2 gap-xl sm:grid-cols-4">
+    <div class="col-span-2 sm:col-span-1">
+      <p class="text-display-sm text-ink">
+        Measure<span class="text-link">Minting</span>
+      </p>
+      <p class="mt-xs max-w-[28ch] text-body-sm text-body">
+        Fast, accurate, ad-free unit conversion for every measurement under the sun.
+      </p>
+    </div>
+
+    <div>
+      <p class="text-caption-mono uppercase text-mute">Categories</p>
+      <ul class="mt-sm flex flex-col gap-xs">
+        {
+          CATEGORIES.map((category) => (
+            <li>
+              <a href={`/${category.id}/`} class="text-body-sm text-body hover:text-ink hover:underline">
+                {category.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div>
+      <p class="text-caption-mono uppercase text-mute">Resources</p>
+      <ul class="mt-sm flex flex-col gap-xs">
+        <li><a href="/all-converters/" class="text-body-sm text-body hover:text-ink hover:underline">All converters</a></li>
+        <li><a href="/about/" class="text-body-sm text-body hover:text-ink hover:underline">About</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="text-caption-mono uppercase text-mute">Site</p>
+      <ul class="mt-sm flex flex-col gap-xs">
+        <li><a href="/sitemap-index.xml" class="text-body-sm text-body hover:text-ink hover:underline">Sitemap</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mx-auto mt-3xl max-w-[1400px] border-t border-hairline pt-lg">
+    <p class="text-caption text-mute">© {year} MeasureMinting. All conversions provided as-is for informational purposes.</p>
+  </div>
+</footer>
