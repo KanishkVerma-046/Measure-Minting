@@ -14,14 +14,14 @@ const { compact = false, class: className = "" } = Astro.props;
     "relative overflow-hidden",
     compact
       ? "px-md py-2xl sm:py-3xl sm:px-lg lg:py-5xl"
-      : "px-md py-4xl sm:py-5xl sm:px-lg lg:py-section",
+      : "px-md pt-2xl pb-4xl sm:pt-3xl sm:pb-5xl sm:px-lg lg:pt-4xl lg:pb-section",
     className,
   ].join(" ")}
   style="background: linear-gradient(160deg, var(--color-canvas) 0%, var(--color-link-bg-soft) 60%, var(--color-canvas-soft-2) 100%);"
 >
   <MeshGradient />
   <div class="relative mx-auto max-w-[1400px] text-center">
-    <h1 class={compact ? "text-display-lg text-ink text-balance" : "text-display-xl text-ink text-balance"}>
+    <h1 class={compact ? "text-display-lg text-ink text-balance" : "text-display-2xl text-ink text-balance"}>
       <slot name="title" />
     </h1>
     <div class="mt-md">

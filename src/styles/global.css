@@ -84,6 +84,11 @@
   --radius-pill: 100px;
   --radius-full: 9999px;
 
+  --text-display-2xl: 64px;
+  --text-display-2xl--line-height: 68px;
+  --text-display-2xl--letter-spacing: -3.2px;
+  --text-display-2xl--font-weight: 700;
+
   --text-display-xl: 48px;
   --text-display-xl--line-height: 48px;
   --text-display-xl--letter-spacing: -2.4px;
