@@ -1,0 +1,163 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import { CATEGORIES } from "../../lib/units";
+import { categoryPath } from "../../lib/paths";
+
+const path = "/sitemap/";
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: "Sitemap", path },
+];
+
+const mainPages = [
+  { label: "Home", href: "/" },
+  { label: "All Converters", href: "/all-converters/" },
+  { label: "All Calculators", href: "/calculators/" },
+  { label: "Scientific Calculator", href: "/calculator/" },
+];
+
+const companyPages = [
+  { label: "About Us", href: "/about/" },
+  { label: "Contact Us", href: "/contact/" },
+  { label: "Privacy Policy", href: "/privacy/" },
+  { label: "Terms & Conditions", href: "/terms/" },
+];
+
+const calculatorGroups = [
+  {
+    label: "Financial",
+    tools: [
+      { label: "Mortgage Calculator", href: "/calculators/mortgage/" },
+      { label: "Loan Calculator", href: "/calculators/loan/" },
+      { label: "Auto Loan Calculator", href: "/calculators/auto-loan/" },
+      { label: "Compound Interest Calculator", href: "/calculators/compound-interest/" },
+      { label: "Investment Calculator", href: "/calculators/investment/" },
+      { label: "Retirement Calculator", href: "/calculators/retirement/" },
+      { label: "Amortization Calculator", href: "/calculators/amortization/" },
+      { label: "Inflation Calculator", href: "/calculators/inflation/" },
+      { label: "Income Tax Calculator", href: "/calculators/income-tax/" },
+      { label: "Interest Calculator", href: "/calculators/interest/" },
+      { label: "Payment Calculator", href: "/calculators/payment/" },
+      { label: "Salary Calculator", href: "/calculators/salary/" },
+      { label: "Interest Rate Calculator", href: "/calculators/interest-rate/" },
+      { label: "Sales Tax Calculator", href: "/calculators/sales-tax/" },
+      { label: "Finance Calculator", href: "/calculators/finance/" },
+    ],
+  },
+  {
+    label: "Health & Fitness",
+    tools: [
+      { label: "BMI Calculator", href: "/calculators/bmi/" },
+      { label: "Calorie Calculator", href: "/calculators/calorie/" },
+      { label: "Body Fat Calculator", href: "/calculators/body-fat/" },
+      { label: "BMR Calculator", href: "/calculators/bmr/" },
+      { label: "Ideal Weight Calculator", href: "/calculators/ideal-weight/" },
+      { label: "Pace Calculator", href: "/calculators/pace/" },
+      { label: "Pregnancy Calculator", href: "/calculators/pregnancy/" },
+      { label: "Due Date Calculator", href: "/calculators/due-date/" },
+      { label: "Pregnancy Conception Calculator", href: "/calculators/pregnancy-conception/" },
+    ],
+  },
+  {
+    label: "Math",
+    tools: [
+      { label: "Scientific Calculator", href: "/calculator/" },
+      { label: "Percentage Calculator", href: "/calculators/percentage/" },
+      { label: "Fraction Calculator", href: "/calculators/fraction/" },
+      { label: "Triangle Calculator", href: "/calculators/triangle/" },
+      { label: "Standard Deviation Calculator", href: "/calculators/standard-deviation/" },
+      { label: "Random Number Generator", href: "/calculators/random-number/" },
+    ],
+  },
+  {
+    label: "Other",
+    tools: [
+      { label: "Age Calculator", href: "/calculators/age/" },
+      { label: "Date Calculator", href: "/calculators/date/" },
+      { label: "Time Calculator", href: "/calculators/time/" },
+      { label: "Hours Calculator", href: "/calculators/hours/" },
+      { label: "GPA Calculator", href: "/calculators/gpa/" },
+      { label: "Grade Calculator", href: "/calculators/grade/" },
+      { label: "Concrete Calculator", href: "/calculators/concrete/" },
+      { label: "Subnet Calculator", href: "/calculators/subnet/" },
+      { label: "Password Generator", href: "/calculators/password/" },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Sitemap — MeasureMinting"
+  description="A complete list of all pages on MeasureMinting — unit converters, calculators, and company pages."
+  path={path}
+>
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h1 class="text-display-xl text-ink">Sitemap</h1>
+      <p class="mt-sm text-body-md text-body">Every page on MeasureMinting, organised by category.</p>
+
+      <div class="mt-3xl grid grid-cols-1 gap-3xl lg:grid-cols-2">
+
+        <!-- Main & Company -->
+        <div class="space-y-2xl">
+          <div>
+            <h2 class="text-display-md text-ink border-b border-hairline pb-sm">Main Pages</h2>
+            <ul class="mt-md space-y-xs">
+              {mainPages.map(({ label, href }) => (
+                <li>
+                  <a href={href} class="text-body-md text-link hover:underline">{label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-display-md text-ink border-b border-hairline pb-sm">Company</h2>
+            <ul class="mt-md space-y-xs">
+              {companyPages.map(({ label, href }) => (
+                <li>
+                  <a href={href} class="text-body-md text-link hover:underline">{label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-display-md text-ink border-b border-hairline pb-sm">Unit Converters</h2>
+            <ul class="mt-md space-y-xs">
+              {CATEGORIES.map((category) => (
+                <li>
+                  <a href={categoryPath(category.id)} class="text-body-md text-link hover:underline">
+                    {category.label} Converter
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Calculators -->
+        <div class="space-y-2xl">
+          {calculatorGroups.map((group) => (
+            <div>
+              <h2 class="text-display-md text-ink border-b border-hairline pb-sm">{group.label} Calculators</h2>
+              <ul class="mt-md space-y-xs">
+                {group.tools.map(({ label, href }) => (
+                  <li>
+                    <a href={href} class="text-body-md text-link hover:underline">{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  </section>
+</BaseLayout>
