@@ -43,6 +43,14 @@ const { title, description, path, keywords, ogImage, ogType } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <Seo title={title} description={description} path={path} keywords={keywords} ogImage={ogImage} ogType={ogType} />
     <slot name="head" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PH05G42P2J"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PH05G42P2J');
+    </script>
   </head>
   <body class="flex min-h-screen flex-col bg-canvas-soft text-ink">
     <NavBar />
