@@ -14,7 +14,7 @@ const { compact = false, class: className = "" } = Astro.props;
     "relative overflow-hidden",
     compact
       ? "px-md py-2xl sm:py-3xl sm:px-lg lg:py-5xl"
-      : "px-md pt-2xl pb-4xl sm:pt-3xl sm:pb-5xl sm:px-lg lg:pt-4xl lg:pb-section",
+      : "px-md pt-4xl pb-4xl sm:pt-5xl sm:pb-5xl sm:px-lg lg:pt-section lg:pb-section",
     className,
   ].join(" ")}
   style="background: linear-gradient(160deg, var(--color-canvas) 0%, var(--color-link-bg-soft) 60%, var(--color-canvas-soft-2) 100%);"
@@ -24,7 +24,7 @@ const { compact = false, class: className = "" } = Astro.props;
     <h1 class={compact ? "text-display-lg text-ink text-balance" : "text-display-xl text-ink text-balance"}>
       <slot name="title" />
     </h1>
-    <div class="mt-4xl">
+    <div class="mt-3xl">
       <slot name="badge" />
     </div>
     <p class="mx-auto mt-sm max-w-[60ch] text-body-lg text-body text-pretty">
