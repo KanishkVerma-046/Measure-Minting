@@ -11,7 +11,7 @@ import { CATEGORIES } from "../lib/units";
       Measure<span class="text-link">Minting</span>
     </a>
 
-    <nav aria-label="Categories" class="hidden items-center gap-xxs md:flex">
+    <nav aria-label="Categories" class="hidden items-center gap-xxs lg:flex">
       {
         CATEGORIES.map((category) => (
           <a
@@ -24,16 +24,33 @@ import { CATEGORIES } from "../lib/units";
       }
     </nav>
 
-    <div class="hidden shrink-0 md:block">
+    <div class="flex shrink-0 items-center gap-xs">
+      <button
+        id="theme-toggle"
+        type="button"
+        aria-label="Toggle dark mode"
+        class="flex h-9 w-9 items-center justify-center rounded-sm border border-hairline bg-canvas text-ink transition-colors hover:bg-canvas-soft"
+      >
+        <!-- Moon: visible in light mode -->
+        <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>
+        </svg>
+        <!-- Sun: visible in dark mode (hidden by default) -->
+        <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="hidden">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
+
       <a
         href="/all-converters/"
-        class="inline-flex h-7 items-center rounded-sm border border-hairline bg-canvas px-xs text-body-sm-strong text-ink transition-colors hover:bg-canvas-soft"
+        class="hidden lg:inline-flex h-7 items-center rounded-sm border border-hairline bg-canvas px-xs text-body-sm-strong text-ink transition-colors hover:bg-canvas-soft"
       >
         Browse all
       </a>
     </div>
 
-    <details class="relative md:hidden">
+    <details class="relative lg:hidden">
       <summary
         aria-label="Open menu"
         class="flex h-9 w-9 list-none items-center justify-center rounded-sm border border-hairline [&::-webkit-details-marker]:hidden"
@@ -60,3 +77,29 @@ import { CATEGORIES } from "../lib/units";
     </details>
   </div>
 </header>
+
+<script>
+  const toggleBtn = document.getElementById("theme-toggle");
+  const moonIcon = document.getElementById("theme-icon-moon");
+  const sunIcon = document.getElementById("theme-icon-sun");
+
+  function applyIcons(isDark: boolean) {
+    if (isDark) {
+      moonIcon?.classList.add("hidden");
+      sunIcon?.classList.remove("hidden");
+    } else {
+      moonIcon?.classList.remove("hidden");
+      sunIcon?.classList.add("hidden");
+    }
+  }
+
+  // Sync icon with whatever the init script set on <html>
+  applyIcons(document.documentElement.classList.contains("dark"));
+
+  toggleBtn?.addEventListener("click", () => {
+    const nowDark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", nowDark);
+    localStorage.setItem("mm-theme", nowDark ? "dark" : "light");
+    applyIcons(nowDark);
+  });
+</script>

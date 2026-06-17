@@ -25,10 +25,12 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
 ---
 
 <unit-converter data-category={categoryId} class={["block", className].join(" ")}>
-  <div class="flex flex-col gap-sm md:flex-row md:items-end">
+  <div class="flex flex-col gap-md md:flex-row md:items-end">
+
+    <!-- From field -->
     <div class="flex-1">
-      <label for={`${fieldId}-from-value`} class="mb-xxs block text-caption-mono uppercase text-mute">From</label>
-      <div class="flex gap-xs">
+      <label for={`${fieldId}-from-value`} class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">From</label>
+      <div class="flex flex-col gap-xs sm:flex-row">
         <input
           id={`${fieldId}-from-value`}
           name={`${fieldId}-from-value`}
@@ -42,7 +44,7 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
         <select
           data-role="from-unit"
           aria-label="From unit"
-          class="h-12 shrink-0 rounded-sm border border-hairline bg-canvas px-sm text-body-sm text-ink focus-visible:border-ink"
+          class="h-10 w-full rounded-sm border border-hairline bg-canvas px-sm text-body-sm text-ink focus-visible:border-ink sm:h-12 sm:w-48 sm:shrink-0"
         >
           {
             category.units.map((unit) => (
@@ -55,11 +57,12 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
       </div>
     </div>
 
+    <!-- Swap button -->
     <button
       type="button"
       data-role="swap"
       aria-label="Swap units"
-      class="mx-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-hairline bg-canvas text-ink transition-transform hover:rotate-180 md:mb-px"
+      class="mx-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-hairline bg-canvas text-ink transition-transform hover:rotate-180 md:mb-0.5"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M7 10L3 6l4-4M3 6h13a4 4 0 0 1 4 4v1" />
@@ -67,9 +70,10 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
       </svg>
     </button>
 
+    <!-- To field -->
     <div class="flex-1">
-      <label for={`${fieldId}-to-value`} class="mb-xxs block text-caption-mono uppercase text-mute">To</label>
-      <div class="flex gap-xs">
+      <label for={`${fieldId}-to-value`} class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">To</label>
+      <div class="flex flex-col gap-xs sm:flex-row">
         <input
           id={`${fieldId}-to-value`}
           name={`${fieldId}-to-value`}
@@ -83,7 +87,7 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
         <select
           data-role="to-unit"
           aria-label="To unit"
-          class="h-12 shrink-0 rounded-sm border border-hairline bg-canvas px-sm text-body-sm text-ink focus-visible:border-ink"
+          class="h-10 w-full rounded-sm border border-hairline bg-canvas px-sm text-body-sm text-ink focus-visible:border-ink sm:h-12 sm:w-48 sm:shrink-0"
         >
           {
             category.units.map((unit) => (
@@ -97,11 +101,12 @@ const fieldId = `${categoryId}-${fromUnitId}-${toUnitId}`;
     </div>
   </div>
 
-  <div class="mt-sm flex items-center gap-xs">
+  <!-- Copy result -->
+  <div class="mt-md flex items-center">
     <button
       type="button"
       data-role="copy"
-      class="inline-flex items-center gap-xs rounded-sm border border-hairline bg-canvas px-xs py-1 text-body-sm text-body transition-colors hover:text-ink"
+      class="inline-flex items-center gap-xs rounded-sm border border-hairline bg-canvas px-sm py-xs text-body-sm text-body transition-colors hover:bg-canvas-soft hover:text-ink"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="9" y="9" width="13" height="13" rx="2" />

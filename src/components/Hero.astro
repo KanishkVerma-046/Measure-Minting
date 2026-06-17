@@ -10,7 +10,7 @@ interface Props {
 const { compact = false, class: className = "" } = Astro.props;
 ---
 
-<section class={["relative overflow-hidden bg-canvas", compact ? "px-md py-5xl sm:px-lg" : "px-md py-section sm:px-lg", className].join(" ")}>
+<section class={["relative overflow-hidden bg-canvas", compact ? "px-md py-2xl sm:py-3xl sm:px-lg lg:py-5xl" : "px-md py-4xl sm:py-5xl sm:px-lg lg:py-section", className].join(" ")}>
   <MeshGradient />
   <div class="relative mx-auto max-w-[1400px] text-center">
     <slot name="badge" />
