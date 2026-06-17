@@ -27,8 +27,7 @@ const { title, description, path, keywords, ogImage, ogType } = Astro.props;
     <script is:inline>
       (function () {
         var stored = localStorage.getItem("mm-theme");
-        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (stored === "dark" || (!stored && prefersDark)) {
+        if (stored !== "light") {
           document.documentElement.classList.add("dark");
         }
       })();
