@@ -26,19 +26,19 @@ const features = [
     body: "Type in either field and watch the result update live — no \"Convert\" button, no page reload.",
   },
   {
-    title: "Zero ads, zero trackers",
-    body: "No banner clutter, no pop-ups, no third-party scripts slowing things down. Just the tool.",
-  },
-  {
     title: "Built for every device",
     body: "Fast, accessible, and fully responsive — keyboard-friendly from the first tab stop.",
+  },
+  {
+    title: "Advanced calculator",
+    body: "Beyond unit conversion — evaluate expressions, compute derivatives, and run numerical integrations.",
   },
 ];
 ---
 
 <BaseLayout
   title="MeasureMinting — Free Online Unit Converter"
-  description="Convert length, weight, temperature, volume, area, and speed instantly. Fast, accurate, ad-free unit conversion."
+  description="Convert length, weight, temperature, volume, area, and speed instantly. Fast, accurate unit conversion with a scientific calculator."
   path="/"
 >
   <Hero>
@@ -47,14 +47,14 @@ const features = [
     </Fragment>
     <Fragment slot="title">Convert any unit, instantly.</Fragment>
     <Fragment slot="subtitle">
-      The fast, ad-free unit converter for length, weight, temperature, volume, area, and speed.
+      The fast, accurate unit converter for length, weight, temperature, volume, area, and speed.
     </Fragment>
     <Fragment slot="actions">
       <Button href="/all-converters/" variant="primary">Browse all converters</Button>
       <Button href="/length/" variant="secondary">Start with Length</Button>
     </Fragment>
 
-    <Card variant="marketing-large" class="mx-auto max-w-2xl text-left">
+    <Card variant="marketing-large" class="mx-auto max-w-[42rem] text-left">
       <UnitConverter categoryId="length" fromUnitId="meters" toUnitId="feet" value={1} />
     </Card>
   </Hero>
@@ -86,12 +86,34 @@ const features = [
           featuredPairs.map((pair) => (
             <a
               href={pair.path}
-              class="rounded-full border border-hairline bg-canvas px-md py-xs text-body-sm-strong text-ink transition-colors hover:bg-canvas-soft"
+              class="group inline-flex items-center gap-xs rounded-md border border-hairline bg-canvas px-sm py-xs text-body-sm-strong text-ink shadow-level-1 transition-all hover:border-link hover:text-link hover:shadow-level-3"
             >
               {pair.label}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="opacity-40 transition-opacity group-hover:opacity-100"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           ))
         }
+      </div>
+    </div>
+  </section>
+
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <div class="flex flex-col items-start gap-lg rounded-xl border border-hairline bg-canvas p-2xl shadow-level-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-display-md text-ink">Scientific Calculator</h2>
+          <p class="mt-xs max-w-[48ch] text-body-md text-body">
+            Evaluate expressions, compute symbolic derivatives, and run numerical integrations — all in your browser.
+          </p>
+          <div class="mt-sm flex flex-wrap gap-xs">
+            {["sin / cos / tan", "d/dx Derivatives", "∫ Integration", "log / sqrt / exp"].map((tag) => (
+              <span class="rounded-md border border-hairline bg-canvas-soft px-xs py-1 text-caption text-mute">{tag}</span>
+            ))}
+          </div>
+        </div>
+        <a href="/calculator/" class="shrink-0 inline-flex h-11 items-center rounded-md bg-primary px-lg text-button-lg text-on-primary transition-opacity hover:opacity-80">
+          Open Calculator
+        </a>
       </div>
     </div>
   </section>

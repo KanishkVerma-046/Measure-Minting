@@ -45,9 +45,10 @@ const breadcrumbItems = [
                   return (
                     <a
                       href={pairHref}
-                      class="rounded-full border border-hairline bg-canvas px-sm py-1 text-body-sm text-body transition-colors hover:bg-canvas-soft hover:text-ink"
+                      class="group inline-flex items-center gap-xs rounded-md border border-hairline bg-canvas px-sm py-xs text-body-sm text-body shadow-level-1 transition-all hover:border-link hover:text-link hover:shadow-level-3"
                     >
                       {label}
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="opacity-30 transition-opacity group-hover:opacity-100"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                   );
                 })}

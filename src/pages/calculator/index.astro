@@ -1,0 +1,467 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+const path = "/calculator/";
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: "Calculator", path },
+];
+---
+
+<BaseLayout
+  title="Scientific Calculator — MeasureMinting"
+  description="Free scientific calculator with expression evaluation, symbolic differentiation, numerical integration, and trigonometry."
+  path={path}
+>
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[800px]">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h1 class="text-display-xl text-ink">Scientific Calculator</h1>
+      <p class="mt-sm text-body-lg text-body">
+        Evaluate expressions, compute symbolic derivatives, and run numerical integrations.
+      </p>
+
+      <!-- Mode tabs -->
+      <div class="mt-2xl flex gap-xxs border-b border-hairline">
+        <button data-tab="expression" class="calc-tab border-b-2 border-ink px-md pb-sm pt-xs text-body-sm-strong text-ink transition-colors">
+          Expression
+        </button>
+        <button data-tab="derivative" class="calc-tab border-b-2 border-transparent px-md pb-sm pt-xs text-body-sm-strong text-body transition-colors hover:text-ink">
+          Derivative (d/dx)
+        </button>
+        <button data-tab="integral" class="calc-tab border-b-2 border-transparent px-md pb-sm pt-xs text-body-sm-strong text-body transition-colors hover:text-ink">
+          Integral (∫)
+        </button>
+      </div>
+
+      <!-- ── Expression Mode ── -->
+      <div id="panel-expression" class="calc-panel mt-2xl">
+        <div class="flex flex-col gap-md">
+          <div>
+            <label for="expr-input" class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">Expression</label>
+            <div class="flex gap-xs">
+              <input
+                id="expr-input"
+                type="text"
+                spellcheck="false"
+                autocomplete="off"
+                placeholder="e.g.  2 * sin(pi/4) + sqrt(16)"
+                class="h-12 flex-1 min-w-0 rounded-sm border border-hairline bg-canvas px-sm font-mono text-body-md text-ink focus-visible:border-ink"
+              />
+              <button id="expr-evaluate" class="h-12 shrink-0 rounded-sm bg-primary px-md text-button-md text-on-primary transition-opacity hover:opacity-80">
+                = Evaluate
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick-insert buttons -->
+          <div class="flex flex-wrap gap-xs">
+            {["sin(", "cos(", "tan(", "asin(", "acos(", "atan(", "sqrt(", "log(", "log10(", "exp(", "abs(", "pi", "e", "^"].map((fn) => (
+              <button
+                class="fn-btn rounded-md border border-hairline bg-canvas-soft px-xs py-1 font-mono text-caption text-body transition-colors hover:border-ink hover:text-ink"
+                data-fn={fn}
+              >
+                {fn.endsWith("(") ? fn.slice(0, -1) : fn}
+              </button>
+            ))}
+          </div>
+
+          <div id="expr-result" class="hidden rounded-lg border border-hairline bg-canvas p-lg shadow-level-2">
+            <p class="text-caption-mono uppercase tracking-wide text-mute">Result</p>
+            <p id="expr-result-value" class="mt-xs font-mono text-display-md text-ink break-all"></p>
+            <p id="expr-result-expr" class="mt-xxs text-body-sm text-mute"></p>
+          </div>
+          <div id="expr-error" class="hidden rounded-lg border border-error-soft bg-error-soft p-md">
+            <p id="expr-error-msg" class="text-body-sm text-error-deep"></p>
+          </div>
+        </div>
+
+        <!-- Reference card -->
+        <div class="mt-2xl rounded-lg border border-hairline bg-canvas-soft p-lg">
+          <h3 class="text-body-sm-strong text-ink">Supported syntax</h3>
+          <div class="mt-sm grid grid-cols-1 gap-xs sm:grid-cols-2">
+            {[
+              ["Arithmetic", "2 + 3 * (4 - 1) / 2^3"],
+              ["Trigonometry", "sin(pi/6), cos(0), tan(pi/4)"],
+              ["Inverse trig", "asin(0.5), acos(1), atan(1)"],
+              ["Roots & powers", "sqrt(16), cbrt(27), 2^10"],
+              ["Logarithms", "log(e), log10(100), log2(8)"],
+              ["Constants", "pi, e, tau, Infinity"],
+              ["Rounding", "round(3.7), floor(3.9), ceil(3.1)"],
+              ["Misc", "abs(-5), sign(-3), factorial(6)"],
+            ].map(([name, example]) => (
+              <div>
+                <span class="text-caption text-mute">{name}:</span>
+                <code class="ml-xs text-caption text-body">{example}</code>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Derivative Mode ── -->
+      <div id="panel-derivative" class="calc-panel mt-2xl hidden">
+        <div class="flex flex-col gap-md">
+          <div>
+            <label for="deriv-input" class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">f(x) =</label>
+            <input
+              id="deriv-input"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="e.g.  x^3 + 2*x^2 - 5*x + 1"
+              class="h-12 w-full rounded-sm border border-hairline bg-canvas px-sm font-mono text-body-md text-ink focus-visible:border-ink"
+            />
+          </div>
+          <div class="flex items-end gap-md">
+            <div class="w-28">
+              <label for="deriv-var" class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">Variable</label>
+              <input
+                id="deriv-var"
+                type="text"
+                value="x"
+                maxlength="2"
+                class="h-12 w-full rounded-sm border border-hairline bg-canvas px-sm font-mono text-body-md text-ink focus-visible:border-ink"
+              />
+            </div>
+            <button id="deriv-calculate" class="h-12 flex-1 rounded-sm bg-primary px-md text-button-md text-on-primary transition-opacity hover:opacity-80">
+              d/dx — Differentiate
+            </button>
+          </div>
+
+          <div id="deriv-result" class="hidden rounded-lg border border-hairline bg-canvas p-lg shadow-level-2">
+            <p class="text-caption-mono uppercase tracking-wide text-mute">Derivative</p>
+            <p id="deriv-result-value" class="mt-xs font-mono text-display-md text-ink break-all"></p>
+            <p id="deriv-result-expr" class="mt-xxs text-body-sm text-mute"></p>
+          </div>
+          <div id="deriv-error" class="hidden rounded-lg border border-error-soft bg-error-soft p-md">
+            <p id="deriv-error-msg" class="text-body-sm text-error-deep"></p>
+          </div>
+        </div>
+
+        <div class="mt-2xl rounded-lg border border-hairline bg-canvas-soft p-lg">
+          <h3 class="text-body-sm-strong text-ink">Examples</h3>
+          <div class="mt-sm flex flex-col gap-xs">
+            {[
+              ["x^3 + 2*x^2 - 5*x + 1", "x", "3 x^2 + 4 x - 5"],
+              ["sin(x) * cos(x)", "x", "cos(x)^2 - sin(x)^2"],
+              ["exp(x^2)", "x", "2 x e^(x^2)"],
+              ["log(x)", "x", "1/x"],
+            ].map(([f, v, df]) => (
+              <div class="flex items-center gap-sm flex-wrap">
+                <code class="rounded border border-hairline bg-canvas px-xs py-0.5 text-caption text-ink">f({v}) = {f}</code>
+                <span class="text-caption text-mute">→</span>
+                <code class="rounded border border-hairline bg-canvas px-xs py-0.5 text-caption text-link">f'({v}) = {df}</code>
+                <button
+                  class="example-deriv text-caption text-link hover:underline"
+                  data-expr={f}
+                  data-var={v}
+                >
+                  Try it
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Integral Mode ── -->
+      <div id="panel-integral" class="calc-panel mt-2xl hidden">
+        <div class="flex flex-col gap-md">
+          <div>
+            <label for="integ-input" class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">f(x) =</label>
+            <input
+              id="integ-input"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="e.g.  x^2"
+              class="h-12 w-full rounded-sm border border-hairline bg-canvas px-sm font-mono text-body-md text-ink focus-visible:border-ink"
+            />
+          </div>
+          <div class="flex gap-md">
+            <div class="flex-1">
+              <label for="integ-lower" class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">Lower bound (a)</label>
+              <input
+                id="integ-lower"
+                type="text"
+                value="0"
+                class="h-12 w-full rounded-sm border border-hairline bg-canvas px-sm font-mono text-body-md text-ink focus-visible:border-ink"
+              />
+            </div>
+            <div class="flex-1">
+              <label for="integ-upper" class="mb-xs block text-caption-mono uppercase tracking-wide text-mute">Upper bound (b)</label>
+              <input
+                id="integ-upper"
+                type="text"
+                value="1"
+                class="h-12 w-full rounded-sm border border-hairline bg-canvas px-sm font-mono text-body-md text-ink focus-visible:border-ink"
+              />
+            </div>
+          </div>
+          <button id="integ-calculate" class="h-12 w-full rounded-sm bg-primary px-md text-button-md text-on-primary transition-opacity hover:opacity-80">
+            ∫ Integrate (numerical)
+          </button>
+
+          <div id="integ-result" class="hidden rounded-lg border border-hairline bg-canvas p-lg shadow-level-2">
+            <p class="text-caption-mono uppercase tracking-wide text-mute">Result</p>
+            <p id="integ-result-value" class="mt-xs font-mono text-display-md text-ink break-all"></p>
+            <p id="integ-result-expr" class="mt-xxs text-body-sm text-mute"></p>
+          </div>
+          <div id="integ-error" class="hidden rounded-lg border border-error-soft bg-error-soft p-md">
+            <p id="integ-error-msg" class="text-body-sm text-error-deep"></p>
+          </div>
+        </div>
+
+        <div class="mt-2xl rounded-lg border border-hairline bg-canvas-soft p-lg">
+          <h3 class="text-body-sm-strong text-ink">Examples</h3>
+          <div class="mt-sm flex flex-col gap-xs">
+            {[
+              ["x^2", "0", "1", "≈ 0.3333"],
+              ["sin(x)", "0", "pi", "≈ 2"],
+              ["exp(-x^2)", "0", "1", "≈ 0.7468"],
+              ["1/x", "1", "e", "≈ 1"],
+            ].map(([f, a, b, res]) => (
+              <div class="flex items-center gap-sm flex-wrap">
+                <code class="rounded border border-hairline bg-canvas px-xs py-0.5 text-caption text-ink">∫<sub>{a}</sub><sup>{b}</sup> {f} dx</code>
+                <span class="text-caption text-mute">→</span>
+                <code class="rounded border border-hairline bg-canvas px-xs py-0.5 text-caption text-link">{res}</code>
+                <button
+                  class="example-integ text-caption text-link hover:underline"
+                  data-expr={f}
+                  data-lower={a}
+                  data-upper={b}
+                >
+                  Try it
+                </button>
+              </div>
+            ))}
+          </div>
+          <p class="mt-md text-caption text-mute">Uses adaptive Simpson's rule with 10 000 subintervals. Results are numerical approximations.</p>
+        </div>
+      </div>
+
+      <!-- ── History ── -->
+      <div id="calc-history-wrap" class="mt-3xl hidden">
+        <h2 class="text-display-sm text-ink">History</h2>
+        <div id="calc-history" class="mt-sm flex flex-col gap-xs"></div>
+        <button id="calc-history-clear" class="mt-sm text-body-sm text-mute hover:text-ink">Clear history</button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script type="module">
+  // Load math.js from CDN
+  const { create, all } = await import("https://cdn.jsdelivr.net/npm/mathjs@13.2.0/+esm");
+  const math = create(all);
+
+  // ── Numerical integration: composite Simpson's 1/3 rule ──
+  function simpsonIntegrate(fn, a, b, n = 10000) {
+    if (n % 2 !== 0) n++;
+    const h = (b - a) / n;
+    let sum = fn(a) + fn(b);
+    for (let i = 1; i < n; i++) {
+      sum += (i % 2 === 0 ? 2 : 4) * fn(a + i * h);
+    }
+    return (h / 3) * sum;
+  }
+
+  // ── History ──
+  const history = [];
+
+  function addHistory(mode, input, result) {
+    history.unshift({ mode, input, result });
+    if (history.length > 10) history.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const wrap = document.getElementById("calc-history-wrap");
+    const container = document.getElementById("calc-history");
+    if (!wrap || !container) return;
+    if (history.length === 0) { wrap.classList.add("hidden"); return; }
+    wrap.classList.remove("hidden");
+    container.innerHTML = history.map(({ mode, input, result }) => `
+      <div class="flex items-center gap-sm rounded-md border border-hairline bg-canvas px-sm py-xs shadow-level-1">
+        <span class="shrink-0 rounded border border-hairline px-xs py-0.5 font-mono text-caption text-mute">${mode}</span>
+        <span class="flex-1 min-w-0 truncate font-mono text-body-sm text-body">${escHtml(input)}</span>
+        <span class="shrink-0 font-mono text-body-sm-strong text-ink">${escHtml(result)}</span>
+      </div>
+    `).join("");
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  document.getElementById("calc-history-clear")?.addEventListener("click", () => {
+    history.length = 0;
+    renderHistory();
+  });
+
+  // ── Tab switching ──
+  const tabs = document.querySelectorAll(".calc-tab");
+  const panels = document.querySelectorAll(".calc-panel");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.tab;
+      tabs.forEach((t) => {
+        const active = t.dataset.tab === target;
+        t.classList.toggle("border-ink", active);
+        t.classList.toggle("text-ink", active);
+        t.classList.toggle("border-transparent", !active);
+        t.classList.toggle("text-body", !active);
+      });
+      panels.forEach((p) => {
+        p.classList.toggle("hidden", p.id !== `panel-${target}`);
+      });
+    });
+  });
+
+  // ── Quick-insert function buttons ──
+  const exprInput = document.getElementById("expr-input");
+  document.querySelectorAll(".fn-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const fn = btn.dataset.fn;
+      if (!exprInput) return;
+      const pos = exprInput.selectionStart ?? exprInput.value.length;
+      exprInput.value = exprInput.value.slice(0, pos) + fn + exprInput.value.slice(pos);
+      const newPos = pos + fn.length;
+      exprInput.setSelectionRange(newPos, newPos);
+      exprInput.focus();
+    });
+  });
+
+  // ── Expression evaluation ──
+  function showResult(resultEl, valueEl, exprEl, msg, sub) {
+    resultEl.classList.remove("hidden");
+    valueEl.textContent = msg;
+    if (exprEl && sub) exprEl.textContent = sub;
+  }
+  function showError(errorEl, msgEl, msg) {
+    errorEl.classList.remove("hidden");
+    msgEl.textContent = msg;
+  }
+  function clearResult(resultEl, errorEl) {
+    resultEl.classList.add("hidden");
+    errorEl.classList.add("hidden");
+  }
+
+  const exprEvaluate = document.getElementById("expr-evaluate");
+  const exprResult = document.getElementById("expr-result");
+  const exprResultValue = document.getElementById("expr-result-value");
+  const exprResultExpr = document.getElementById("expr-result-expr");
+  const exprError = document.getElementById("expr-error");
+  const exprErrorMsg = document.getElementById("expr-error-msg");
+
+  function evaluateExpr() {
+    const raw = exprInput?.value.trim();
+    if (!raw) return;
+    clearResult(exprResult, exprError);
+    try {
+      const result = math.evaluate(raw);
+      const formatted = typeof result === "number"
+        ? math.format(result, { precision: 14 })
+        : result.toString();
+      showResult(exprResult, exprResultValue, exprResultExpr, formatted, raw);
+      addHistory("expr", raw, formatted);
+    } catch (err) {
+      showError(exprError, exprErrorMsg, err.message || "Could not evaluate expression");
+    }
+  }
+
+  exprEvaluate?.addEventListener("click", evaluateExpr);
+  exprInput?.addEventListener("keydown", (e) => { if (e.key === "Enter") evaluateExpr(); });
+
+  // ── Derivative calculation ──
+  const derivInput = document.getElementById("deriv-input");
+  const derivVar = document.getElementById("deriv-var");
+  const derivCalc = document.getElementById("deriv-calculate");
+  const derivResult = document.getElementById("deriv-result");
+  const derivResultValue = document.getElementById("deriv-result-value");
+  const derivResultExpr = document.getElementById("deriv-result-expr");
+  const derivError = document.getElementById("deriv-error");
+  const derivErrorMsg = document.getElementById("deriv-error-msg");
+
+  function calcDerivative() {
+    const raw = derivInput?.value.trim();
+    const variable = derivVar?.value.trim() || "x";
+    if (!raw) return;
+    clearResult(derivResult, derivError);
+    try {
+      const node = math.parse(raw);
+      const derived = math.derivative(node, variable);
+      const simplified = math.simplify(derived);
+      const result = simplified.toString();
+      showResult(derivResult, derivResultValue, derivResultExpr, result, `d/d${variable} (${raw})`);
+      addHistory("d/dx", `d/d${variable}(${raw})`, result);
+    } catch (err) {
+      showError(derivError, derivErrorMsg, err.message || "Could not differentiate expression. Check your syntax.");
+    }
+  }
+
+  derivCalc?.addEventListener("click", calcDerivative);
+  derivInput?.addEventListener("keydown", (e) => { if (e.key === "Enter") calcDerivative(); });
+
+  document.querySelectorAll(".example-deriv").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (derivInput) derivInput.value = btn.dataset.expr;
+      if (derivVar) derivVar.value = btn.dataset.var;
+      calcDerivative();
+    });
+  });
+
+  // ── Integral calculation ──
+  const integInput = document.getElementById("integ-input");
+  const integLower = document.getElementById("integ-lower");
+  const integUpper = document.getElementById("integ-upper");
+  const integCalc = document.getElementById("integ-calculate");
+  const integResult = document.getElementById("integ-result");
+  const integResultValue = document.getElementById("integ-result-value");
+  const integResultExpr = document.getElementById("integ-result-expr");
+  const integError = document.getElementById("integ-error");
+  const integErrorMsg = document.getElementById("integ-error-msg");
+
+  function calcIntegral() {
+    const raw = integInput?.value.trim();
+    const lowerRaw = integLower?.value.trim();
+    const upperRaw = integUpper?.value.trim();
+    if (!raw) return;
+    clearResult(integResult, integError);
+    try {
+      const a = math.evaluate(lowerRaw || "0");
+      const b = math.evaluate(upperRaw || "1");
+      if (typeof a !== "number" || typeof b !== "number") throw new Error("Bounds must evaluate to numbers");
+      const scope = {};
+      const fn = (x) => {
+        scope.x = x;
+        const val = math.evaluate(raw, scope);
+        return typeof val === "number" ? val : NaN;
+      };
+      const result = simpsonIntegrate(fn, a, b);
+      const formatted = math.format(result, { precision: 12 });
+      showResult(integResult, integResultValue, integResultExpr, formatted, `∫${lowerRaw}→${upperRaw} (${raw}) dx`);
+      addHistory("∫", `∫[${lowerRaw},${upperRaw}] ${raw}`, formatted);
+    } catch (err) {
+      showError(integError, integErrorMsg, err.message || "Could not integrate. Check expression and bounds.");
+    }
+  }
+
+  integCalc?.addEventListener("click", calcIntegral);
+  integInput?.addEventListener("keydown", (e) => { if (e.key === "Enter") calcIntegral(); });
+
+  document.querySelectorAll(".example-integ").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (integInput) integInput.value = btn.dataset.expr;
+      if (integLower) integLower.value = btn.dataset.lower;
+      if (integUpper) integUpper.value = btn.dataset.upper;
+      calcIntegral();
+    });
+  });
+</script>
