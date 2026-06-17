@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 import sitemap from '@astrojs/sitemap';
 
-const SITE = 'https://unitconverterz.com';
+const SITE = 'https://unitconverterszone.com';
 const lastmod = new Date().toISOString().split('T')[0];
 
 export default defineConfig({

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /500
 
-Sitemap: https://unitconverterz.com/sitemap-index.xml
+Sitemap: https://unitconverterszone.com/sitemap-index.xml
