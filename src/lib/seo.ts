@@ -1,5 +1,5 @@
 export const SITE_NAME = "MeasureMinting";
-export const SITE_URL = "https://unitconverterz.com";
+export const SITE_URL = "https://unitconverterszone.com";
 
 export interface BreadcrumbItem {
   label: string;
