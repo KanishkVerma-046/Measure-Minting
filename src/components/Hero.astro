@@ -21,10 +21,12 @@ const { compact = false, class: className = "" } = Astro.props;
 >
   <MeshGradient />
   <div class="relative mx-auto max-w-[1400px] text-center">
-    <slot name="badge" />
-    <h1 class={compact ? "mt-md text-display-lg text-ink text-balance" : "mt-lg text-display-xl text-ink text-balance"}>
+    <h1 class={compact ? "text-display-lg text-ink text-balance" : "text-display-xl text-ink text-balance"}>
       <slot name="title" />
     </h1>
+    <div class="mt-md">
+      <slot name="badge" />
+    </div>
     <p class="mx-auto mt-sm max-w-[60ch] text-body-lg text-body text-pretty">
       <slot name="subtitle" />
     </p>
