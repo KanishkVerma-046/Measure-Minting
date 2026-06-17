@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Calorie Calculator — Daily Calorie Needs (TDEE) | MeasureMinting" description="Calculate your Total Daily Energy Expenditure (TDEE) and daily calorie needs based on your activity level." path="/calculators/calorie/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Health & Fitness</div>
+      <h1 class="text-display-lg text-ink">Calorie Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate your daily calorie needs (TDEE) for weight maintenance, loss, or gain.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="cal-form">
+          <div class="mb-md flex gap-sm">
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="system" value="metric" checked class="accent-link"> Metric</label>
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="system" value="imperial" class="accent-link"> Imperial</label>
+          </div>
+          <div class="mb-md flex gap-sm">
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sex" value="male" checked class="accent-link"> Male</label>
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sex" value="female" class="accent-link"> Female</label>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="age">Age</label>
+            <input class="calc-input" id="age" type="number" min="15" max="100" placeholder="25">
+          </div>
+          <div id="metric-fields">
+            <div class="flex gap-sm">
+              <div class="calc-field flex-1"><label class="calc-label" for="weight-kg">Weight (kg)</label><input class="calc-input" id="weight-kg" type="number" step="0.1" placeholder="70"></div>
+              <div class="calc-field flex-1"><label class="calc-label" for="height-cm">Height (cm)</label><input class="calc-input" id="height-cm" type="number" step="0.1" placeholder="175"></div>
+            </div>
+          </div>
+          <div id="imperial-fields" class="hidden">
+            <div class="flex gap-sm">
+              <div class="calc-field flex-1"><label class="calc-label" for="weight-lb">Weight (lbs)</label><input class="calc-input" id="weight-lb" type="number" step="0.1" placeholder="154"></div>
+              <div class="calc-field flex-1"><label class="calc-label" for="height-ft">Height (ft)</label><input class="calc-input" id="height-ft" type="number" placeholder="5"></div>
+              <div class="calc-field flex-1"><label class="calc-label" for="height-in">Height (in)</label><input class="calc-input" id="height-in" type="number" step="0.1" placeholder="9"></div>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="activity">Activity Level</label>
+            <select class="calc-select" id="activity">
+              <option value="1.2">Sedentary (little or no exercise)</option>
+              <option value="1.375">Lightly active (1–3 days/wk)</option>
+              <option value="1.55" selected>Moderately active (3–5 days/wk)</option>
+              <option value="1.725">Very active (hard exercise 6–7 days/wk)</option>
+              <option value="1.9">Super active (physical job + training)</option>
+            </select>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Calories</button>
+        </form>
+        <div id="cal-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Maintenance Calories (TDEE)</div>
+            <div id="tdee-value" class="calc-result-primary"></div>
+            <div class="text-body-sm text-body mt-xxs">calories / day</div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Weight loss (–500 kcal/day)</span><span id="loss" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Mild weight loss (–250 kcal/day)</span><span id="mild-loss" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Maintenance</span><span id="maintain" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Mild weight gain (+250 kcal/day)</span><span id="mild-gain" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Weight gain (+500 kcal/day)</span><span id="gain" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="system"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const isMetric = (e.target as HTMLInputElement).value === 'metric';
+      document.getElementById('metric-fields')!.classList.toggle('hidden', !isMetric);
+      document.getElementById('imperial-fields')!.classList.toggle('hidden', isMetric);
+    });
+  });
+
+  document.getElementById('cal-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const isMetric = (document.querySelector('input[name="system"]:checked') as HTMLInputElement).value === 'metric';
+    const isMale = (document.querySelector('input[name="sex"]:checked') as HTMLInputElement).value === 'male';
+    const age = parseFloat((document.getElementById('age') as HTMLInputElement).value);
+    const activity = parseFloat((document.getElementById('activity') as HTMLSelectElement).value);
+    let wKg: number, hCm: number;
+
+    if (isMetric) {
+      wKg = parseFloat((document.getElementById('weight-kg') as HTMLInputElement).value);
+      hCm = parseFloat((document.getElementById('height-cm') as HTMLInputElement).value);
+    } else {
+      wKg = parseFloat((document.getElementById('weight-lb') as HTMLInputElement).value) * 0.453592;
+      const ft = parseFloat((document.getElementById('height-ft') as HTMLInputElement).value) || 0;
+      hCm = (ft * 12 + (parseFloat((document.getElementById('height-in') as HTMLInputElement).value) || 0)) * 2.54;
+    }
+
+    if (!wKg || !hCm || !age) return;
+
+    const bmr = isMale ? 10 * wKg + 6.25 * hCm - 5 * age + 5 : 10 * wKg + 6.25 * hCm - 5 * age - 161;
+    const tdee = Math.round(bmr * activity);
+
+    document.getElementById('tdee-value')!.textContent = tdee.toLocaleString() + ' kcal';
+    document.getElementById('loss')!.textContent = (tdee - 500).toLocaleString() + ' kcal';
+    document.getElementById('mild-loss')!.textContent = (tdee - 250).toLocaleString() + ' kcal';
+    document.getElementById('maintain')!.textContent = tdee.toLocaleString() + ' kcal';
+    document.getElementById('mild-gain')!.textContent = (tdee + 250).toLocaleString() + ' kcal';
+    document.getElementById('gain')!.textContent = (tdee + 500).toLocaleString() + ' kcal';
+
+    const result = document.getElementById('cal-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

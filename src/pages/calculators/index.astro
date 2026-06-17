@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const categories = [
+  {
+    id: "financial",
+    label: "Financial Calculators",
+    description: "Mortgages, loans, investments, taxes, and more.",
+    color: "#059669",
+    tools: [
+      { label: "Mortgage Calculator", href: "/calculators/mortgage/", desc: "Monthly payment, total interest, amortization" },
+      { label: "Loan Calculator", href: "/calculators/loan/", desc: "Personal loan payments and total cost" },
+      { label: "Auto Loan Calculator", href: "/calculators/auto-loan/", desc: "Car payment with down payment & trade-in" },
+      { label: "Compound Interest Calculator", href: "/calculators/compound-interest/", desc: "Growth over time with compounding frequency" },
+      { label: "Investment Calculator", href: "/calculators/investment/", desc: "Future value of investments with contributions" },
+      { label: "Retirement Calculator", href: "/calculators/retirement/", desc: "Retirement savings projections" },
+      { label: "Amortization Calculator", href: "/calculators/amortization/", desc: "Full loan amortization schedule" },
+      { label: "Inflation Calculator", href: "/calculators/inflation/", desc: "Purchasing power over time" },
+      { label: "Income Tax Calculator", href: "/calculators/income-tax/", desc: "US federal income tax estimate" },
+      { label: "Interest Calculator", href: "/calculators/interest/", desc: "Simple interest on any principal" },
+      { label: "Payment Calculator", href: "/calculators/payment/", desc: "Solve for payment, rate, or term" },
+      { label: "Salary Calculator", href: "/calculators/salary/", desc: "Hourly to annual salary conversions" },
+      { label: "Interest Rate Calculator", href: "/calculators/interest-rate/", desc: "Solve for unknown interest rate" },
+      { label: "Sales Tax Calculator", href: "/calculators/sales-tax/", desc: "Price before or after sales tax" },
+      { label: "Finance Calculator", href: "/calculators/finance/", desc: "Time value of money (TVM)" },
+    ],
+  },
+  {
+    id: "health",
+    label: "Health & Fitness Calculators",
+    description: "BMI, calories, body composition, pregnancy, and pace.",
+    color: "#7c3aed",
+    tools: [
+      { label: "BMI Calculator", href: "/calculators/bmi/", desc: "Body Mass Index from height & weight" },
+      { label: "Calorie Calculator", href: "/calculators/calorie/", desc: "Daily calorie needs (TDEE)" },
+      { label: "Body Fat Calculator", href: "/calculators/body-fat/", desc: "Body fat % via Navy circumference method" },
+      { label: "BMR Calculator", href: "/calculators/bmr/", desc: "Basal Metabolic Rate (calories at rest)" },
+      { label: "Ideal Weight Calculator", href: "/calculators/ideal-weight/", desc: "Target weight by multiple formulas" },
+      { label: "Pace Calculator", href: "/calculators/pace/", desc: "Running pace, speed, and finish time" },
+      { label: "Pregnancy Calculator", href: "/calculators/pregnancy/", desc: "Pregnancy weeks and trimester" },
+      { label: "Due Date Calculator", href: "/calculators/due-date/", desc: "Estimated due date from LMP" },
+      { label: "Pregnancy Conception Calculator", href: "/calculators/pregnancy-conception/", desc: "Estimated conception date" },
+    ],
+  },
+  {
+    id: "math",
+    label: "Math Calculators",
+    description: "Fractions, percentages, triangles, statistics, and more.",
+    color: "#d97706",
+    tools: [
+      { label: "Scientific Calculator", href: "/calculator/", desc: "Expressions, derivatives, integrations" },
+      { label: "Percentage Calculator", href: "/calculators/percentage/", desc: "Any percentage problem in three modes" },
+      { label: "Fraction Calculator", href: "/calculators/fraction/", desc: "Add, subtract, multiply, divide fractions" },
+      { label: "Triangle Calculator", href: "/calculators/triangle/", desc: "Sides, angles, and area via law of cosines" },
+      { label: "Standard Deviation Calculator", href: "/calculators/standard-deviation/", desc: "Mean, variance, and SD for data sets" },
+      { label: "Random Number Generator", href: "/calculators/random-number/", desc: "Random integers or decimals in any range" },
+    ],
+  },
+  {
+    id: "other",
+    label: "Other Calculators",
+    description: "Age, dates, GPA, grades, passwords, subnets, and more.",
+    color: "#0891b2",
+    tools: [
+      { label: "Age Calculator", href: "/calculators/age/", desc: "Exact age in years, months, and days" },
+      { label: "Date Calculator", href: "/calculators/date/", desc: "Days between two dates" },
+      { label: "Time Calculator", href: "/calculators/time/", desc: "Add or subtract hours, minutes, seconds" },
+      { label: "Hours Calculator", href: "/calculators/hours/", desc: "Calculate total work hours from time ranges" },
+      { label: "GPA Calculator", href: "/calculators/gpa/", desc: "Semester and cumulative GPA" },
+      { label: "Grade Calculator", href: "/calculators/grade/", desc: "Weighted grade average" },
+      { label: "Concrete Calculator", href: "/calculators/concrete/", desc: "Concrete volume for slabs and columns" },
+      { label: "Subnet Calculator", href: "/calculators/subnet/", desc: "CIDR, network range, and host count" },
+      { label: "Password Generator", href: "/calculators/password/", desc: "Secure random passwords with custom criteria" },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="All Calculators — Free Online Tools | MeasureMinting"
+  description="38+ free online calculators for finance, health, math, and everyday use. Mortgage, BMI, GPA, percentage, compound interest, and more."
+  path="/calculators/"
+>
+  <!-- Hero -->
+  <div class="calc-hero px-md py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <h1 class="text-display-xl text-ink tracking-tight">All Calculators</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">
+        38+ free online calculators for finance, health, math, and everyday use. No sign-up required.
+      </p>
+      <div class="mt-lg flex flex-wrap items-center justify-center gap-sm">
+        {categories.map((cat) => (
+          <a
+            href={`#${cat.id}`}
+            class="inline-flex items-center gap-xs rounded-xl border border-hairline bg-canvas px-sm py-xs text-body-sm-strong text-ink shadow-level-1 transition-all hover:border-link hover:text-link hover:-translate-y-px"
+          >
+            {cat.label.replace(" Calculators", "").replace(" & Fitness", "")}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculator categories -->
+  {categories.map((cat) => (
+    <section id={cat.id} class="px-md py-3xl sm:px-lg scroll-mt-20">
+      <div class="mx-auto max-w-[1400px]">
+        <div class="mb-lg flex items-center gap-md">
+          <div class="h-1 w-8 rounded-full" style={`background-color: ${cat.color};`}></div>
+          <div>
+            <h2 class="text-display-md text-ink">{cat.label}</h2>
+            <p class="mt-xxs text-body-sm text-body">{cat.description}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-sm sm:grid-cols-2 lg:grid-cols-3">
+          {cat.tools.map((tool) => (
+            <a
+              href={tool.href}
+              class="group flex flex-col gap-xxs rounded-xl border border-hairline bg-canvas p-md shadow-level-1 transition-all hover:border-link hover:shadow-level-3 hover:-translate-y-px"
+            >
+              <span class="text-body-md-strong text-ink group-hover:text-link transition-colors">{tool.label}</span>
+              <span class="text-body-sm text-body">{tool.desc}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <div class="h-section"></div>
+</BaseLayout>

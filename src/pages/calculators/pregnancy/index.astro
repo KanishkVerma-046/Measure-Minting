@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Pregnancy Calculator — Weeks & Trimester | MeasureMinting" description="Find out how many weeks pregnant you are and which trimester based on your last menstrual period." path="/calculators/pregnancy/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Health & Fitness</div>
+      <h1 class="text-display-lg text-ink">Pregnancy Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate how far along you are and get key pregnancy milestones.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="preg-form">
+          <div class="calc-field">
+            <label class="calc-label" for="lmp">First day of last menstrual period (LMP)</label>
+            <input class="calc-input" id="lmp" type="date">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="preg-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Gestational Age</div>
+            <div id="weeks-val" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Trimester</span><span id="trimester" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Estimated due date</span><span id="edd" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Days remaining</span><span id="days-left" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Conception date (approx)</span><span id="conception" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('preg-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const lmpVal = (document.getElementById('lmp') as HTMLInputElement).value;
+    if (!lmpVal) return;
+
+    const lmp = new Date(lmpVal);
+    const today = new Date();
+    const diffDays = Math.floor((today.getTime() - lmp.getTime()) / 86400000);
+    if (diffDays < 0 || diffDays > 300) return;
+
+    const weeks = Math.floor(diffDays / 7);
+    const days = diffDays % 7;
+    const edd = new Date(lmp.getTime() + 280 * 86400000);
+    const daysLeft = Math.max(0, Math.floor((edd.getTime() - today.getTime()) / 86400000));
+    const conception = new Date(lmp.getTime() + 14 * 86400000);
+
+    let trimester = '';
+    if (weeks < 13) trimester = '1st Trimester (weeks 1–12)';
+    else if (weeks < 27) trimester = '2nd Trimester (weeks 13–26)';
+    else trimester = '3rd Trimester (weeks 27–40)';
+
+    document.getElementById('weeks-val')!.textContent = `${weeks}w ${days}d`;
+    document.getElementById('trimester')!.textContent = trimester;
+    document.getElementById('edd')!.textContent = edd.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('days-left')!.textContent = `${daysLeft} days`;
+    document.getElementById('conception')!.textContent = conception.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+    const result = document.getElementById('preg-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

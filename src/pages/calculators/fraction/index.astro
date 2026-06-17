@@ -1,0 +1,134 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Fraction Calculator — Add, Subtract, Multiply, Divide | MeasureMinting" description="Perform arithmetic operations on fractions and mixed numbers with step-by-step results." path="/calculators/fraction/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Math</div>
+      <h1 class="text-display-lg text-ink">Fraction Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Add, subtract, multiply, or divide fractions and mixed numbers.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="frac-form">
+          <div class="mb-md">
+            <label class="calc-label mb-sm block">First Fraction</label>
+            <div class="flex items-center gap-xs">
+              <div class="flex flex-col items-center gap-xxs">
+                <input class="calc-input text-center" id="a-whole" type="number" placeholder="0" style="width:70px" title="Whole number">
+                <span class="text-caption text-mute">whole</span>
+              </div>
+              <div class="flex flex-col items-center gap-xxs">
+                <input class="calc-input text-center" id="a-num" type="number" placeholder="1" style="width:70px">
+                <div class="h-px w-full bg-hairline-strong"></div>
+                <input class="calc-input text-center" id="a-den" type="number" placeholder="2" style="width:70px">
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-field">
+            <label class="calc-label">Operation</label>
+            <div class="flex gap-sm">
+              {['+','−','×','÷'].map((op) => (
+                <label class={`flex-1 text-center rounded-xl border border-hairline py-sm cursor-pointer text-body-lg hover:bg-link-bg-soft hover:border-link hover:text-link transition-colors`}>
+                  <input type="radio" name="op" value={op} class="sr-only" checked={op === '+'}> {op}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div class="mb-md">
+            <label class="calc-label mb-sm block">Second Fraction</label>
+            <div class="flex items-center gap-xs">
+              <div class="flex flex-col items-center gap-xxs">
+                <input class="calc-input text-center" id="b-whole" type="number" placeholder="0" style="width:70px">
+                <span class="text-caption text-mute">whole</span>
+              </div>
+              <div class="flex flex-col items-center gap-xxs">
+                <input class="calc-input text-center" id="b-num" type="number" placeholder="1" style="width:70px">
+                <div class="h-px w-full bg-hairline-strong"></div>
+                <input class="calc-input text-center" id="b-den" type="number" placeholder="3" style="width:70px">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="frac-result" class="calc-result hidden">
+          <div class="text-center">
+            <div class="text-caption text-mute mb-xs">Result</div>
+            <div id="frac-r-fraction" class="calc-result-primary mb-xs"></div>
+            <div id="frac-r-decimal" class="text-body-md text-body"></div>
+            <div id="frac-r-mixed" class="text-body-sm text-mute mt-xxs"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function gcd(a: number, b: number): number { return b === 0 ? a : gcd(b, a % b); }
+
+  function toImproper(whole: number, num: number, den: number): [number, number] {
+    const n = (whole >= 0 ? 1 : -1) * (Math.abs(whole) * den + num);
+    return [n, den];
+  }
+
+  function simplify(n: number, d: number): [number, number] {
+    if (d === 0) return [NaN, NaN];
+    const sign = (n < 0 ? -1 : 1) * (d < 0 ? -1 : 1);
+    n = Math.abs(n); d = Math.abs(d);
+    const g = gcd(n, d);
+    return [sign * n / g, d / g];
+  }
+
+  document.getElementById('frac-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const aWhole = parseInt((document.getElementById('a-whole') as HTMLInputElement).value) || 0;
+    const aNum = parseInt((document.getElementById('a-num') as HTMLInputElement).value) || 0;
+    const aDen = parseInt((document.getElementById('a-den') as HTMLInputElement).value) || 1;
+    const bWhole = parseInt((document.getElementById('b-whole') as HTMLInputElement).value) || 0;
+    const bNum = parseInt((document.getElementById('b-num') as HTMLInputElement).value) || 0;
+    const bDen = parseInt((document.getElementById('b-den') as HTMLInputElement).value) || 1;
+    const op = (document.querySelector('input[name="op"]:checked') as HTMLInputElement).value;
+
+    const [aN, aD] = toImproper(aWhole, aNum, aDen);
+    const [bN, bD] = toImproper(bWhole, bNum, bDen);
+
+    let rN: number, rD: number;
+    if (op === '+') { rN = aN * bD + bN * aD; rD = aD * bD; }
+    else if (op === '−') { rN = aN * bD - bN * aD; rD = aD * bD; }
+    else if (op === '×') { rN = aN * bN; rD = aD * bD; }
+    else { rN = aN * bD; rD = aD * bN; }
+
+    const [sN, sD] = simplify(rN, rD);
+    if (isNaN(sN)) { document.getElementById('frac-r-fraction')!.textContent = 'Undefined'; return; }
+
+    const decimal = sN / sD;
+    const whole = Math.trunc(decimal);
+    const rem = Math.abs(sN) % Math.abs(sD);
+
+    document.getElementById('frac-r-fraction')!.textContent = sD === 1 ? sN.toString() : `${sN} / ${sD}`;
+    document.getElementById('frac-r-decimal')!.textContent = '≈ ' + decimal.toFixed(6).replace(/\.?0+$/, '');
+    document.getElementById('frac-r-mixed')!.textContent = (sD !== 1 && rem !== 0) ? `Mixed: ${whole} ${rem}/${sD}` : '';
+
+    const result = document.getElementById('frac-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  // Highlight selected operation
+  document.querySelectorAll('input[name="op"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.querySelectorAll('label:has(input[name="op"])').forEach(l => {
+        const isChecked = (l.querySelector('input') as HTMLInputElement)?.checked;
+        l.classList.toggle('bg-link-bg-soft', isChecked);
+        l.classList.toggle('border-link', isChecked);
+        l.classList.toggle('text-link', isChecked);
+      });
+    });
+  });
+</script>

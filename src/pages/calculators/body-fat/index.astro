@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Body Fat Calculator — US Navy Method | MeasureMinting" description="Estimate body fat percentage using the US Navy circumference method for men and women." path="/calculators/body-fat/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Health & Fitness</div>
+      <h1 class="text-display-lg text-ink">Body Fat Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Estimate your body fat percentage using the US Navy circumference method.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="bf-form">
+          <div class="mb-md flex gap-sm">
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="system" value="metric" checked class="accent-link"> Metric (cm)</label>
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="system" value="imperial" class="accent-link"> Imperial (in)</label>
+          </div>
+          <div class="mb-md flex gap-sm">
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sex" value="male" checked class="accent-link"> Male</label>
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sex" value="female" class="accent-link"> Female</label>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="height">Height <span id="height-unit">(cm)</span></label>
+            <input class="calc-input" id="height" type="number" step="0.1" placeholder="175">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="neck">Neck circumference <span id="neck-unit">(cm)</span></label>
+            <input class="calc-input" id="neck" type="number" step="0.1" placeholder="38">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="waist">Waist circumference <span id="waist-unit">(cm)</span></label>
+            <input class="calc-input" id="waist" type="number" step="0.1" placeholder="85">
+          </div>
+          <div id="hip-field" class="calc-field hidden">
+            <label class="calc-label" for="hip">Hip circumference <span id="hip-unit">(cm)</span></label>
+            <input class="calc-input" id="hip" type="number" step="0.1" placeholder="95">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Body Fat</button>
+        </form>
+        <div id="bf-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Body Fat Percentage</div>
+            <div id="bf-value" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Category</span><span id="bf-category" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Fat mass</span><span id="fat-mass" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Lean mass</span><span id="lean-mass" class="calc-result-value"></span></div>
+        </div>
+        <p class="mt-md text-caption text-mute">Measurements: measure at the narrowest point (waist), widest point (hips), and mid-neck.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="system"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const unit = (e.target as HTMLInputElement).value === 'metric' ? 'cm' : 'in';
+      ['height-unit','neck-unit','waist-unit','hip-unit'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = `(${unit})`; });
+    });
+  });
+
+  document.querySelectorAll('input[name="sex"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const isFemale = (e.target as HTMLInputElement).value === 'female';
+      document.getElementById('hip-field')!.classList.toggle('hidden', !isFemale);
+    });
+  });
+
+  document.getElementById('bf-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const isMetric = (document.querySelector('input[name="system"]:checked') as HTMLInputElement).value === 'metric';
+    const isMale = (document.querySelector('input[name="sex"]:checked') as HTMLInputElement).value === 'male';
+
+    let height = parseFloat((document.getElementById('height') as HTMLInputElement).value);
+    let neck = parseFloat((document.getElementById('neck') as HTMLInputElement).value);
+    let waist = parseFloat((document.getElementById('waist') as HTMLInputElement).value);
+    let hip = parseFloat((document.getElementById('hip') as HTMLInputElement).value) || 0;
+
+    if (!isMetric) { height *= 2.54; neck *= 2.54; waist *= 2.54; hip *= 2.54; }
+    if (!height || !neck || !waist) return;
+
+    let bf: number;
+    if (isMale) {
+      bf = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)) - 450;
+    } else {
+      if (!hip) return;
+      bf = 495 / (1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.22100 * Math.log10(height)) - 450;
+    }
+
+    bf = Math.max(0, Math.min(bf, 100));
+    document.getElementById('bf-value')!.textContent = bf.toFixed(1) + '%';
+
+    let category = '';
+    if (isMale) {
+      if (bf < 6) category = 'Essential fat'; else if (bf < 14) category = 'Athletic'; else if (bf < 18) category = 'Fit'; else if (bf < 25) category = 'Average'; else category = 'Obese';
+    } else {
+      if (bf < 14) category = 'Essential fat'; else if (bf < 21) category = 'Athletic'; else if (bf < 25) category = 'Fit'; else if (bf < 32) category = 'Average'; else category = 'Obese';
+    }
+    document.getElementById('bf-category')!.textContent = category;
+
+    const weightInput = document.querySelector('input[id="weight-kg"]') as HTMLInputElement;
+    document.getElementById('fat-mass')!.textContent = 'N/A (no weight input)';
+    document.getElementById('lean-mass')!.textContent = 'N/A (no weight input)';
+
+    const result = document.getElementById('bf-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

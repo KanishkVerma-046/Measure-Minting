@@ -1,0 +1,97 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Password Generator — Secure Random Passwords | MeasureMinting" description="Generate strong, random passwords with customizable length and character sets." path="/calculators/password/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Other</div>
+      <h1 class="text-display-lg text-ink">Password Generator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Generate cryptographically secure random passwords with custom criteria.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <div class="calc-field">
+          <label class="calc-label" for="pw-length">Password Length: <span id="pw-length-val">16</span></label>
+          <input type="range" id="pw-length" min="4" max="128" value="16" class="w-full accent-link" style="height:6px">
+        </div>
+        <div class="space-y-xs mb-lg">
+          <label class="flex items-center gap-sm cursor-pointer"><input type="checkbox" id="pw-upper" checked class="accent-link rounded"> <span class="text-body-sm">Uppercase letters (A–Z)</span></label>
+          <label class="flex items-center gap-sm cursor-pointer"><input type="checkbox" id="pw-lower" checked class="accent-link rounded"> <span class="text-body-sm">Lowercase letters (a–z)</span></label>
+          <label class="flex items-center gap-sm cursor-pointer"><input type="checkbox" id="pw-digits" checked class="accent-link rounded"> <span class="text-body-sm">Numbers (0–9)</span></label>
+          <label class="flex items-center gap-sm cursor-pointer"><input type="checkbox" id="pw-symbols" checked class="accent-link rounded"> <span class="text-body-sm">Symbols (!@#$%^&*)</span></label>
+          <label class="flex items-center gap-sm cursor-pointer"><input type="checkbox" id="pw-exclude-similar"> <span class="text-body-sm">Exclude similar characters (l, 1, O, 0)</span></label>
+        </div>
+        <div class="calc-field">
+          <label class="calc-label" for="pw-count">How many passwords</label>
+          <input class="calc-input" id="pw-count" type="number" min="1" max="20" value="1">
+        </div>
+        <button id="pw-btn" type="button" class="calc-btn btn-gradient text-white">Generate Password</button>
+
+        <div id="pw-result" class="hidden mt-lg">
+          <div id="pw-list" class="space-y-sm"></div>
+          <div class="mt-md">
+            <div class="calc-result-row"><span class="calc-result-label">Entropy</span><span id="pw-entropy" class="calc-result-value"></span></div>
+            <div class="calc-result-row"><span class="calc-result-label">Charset size</span><span id="pw-charset" class="calc-result-value"></span></div>
+          </div>
+          <button id="pw-again" type="button" class="mt-md inline-flex items-center gap-xs rounded-xl border border-link text-link px-md py-xs text-body-sm-strong hover:bg-link-bg-soft transition-colors">
+            Generate again
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const slider = document.getElementById('pw-length') as HTMLInputElement;
+  const lenVal = document.getElementById('pw-length-val')!;
+  slider.addEventListener('input', () => { lenVal.textContent = slider.value; });
+
+  function generate() {
+    const len = parseInt(slider.value);
+    const count = parseInt((document.getElementById('pw-count') as HTMLInputElement).value) || 1;
+    const useUpper = (document.getElementById('pw-upper') as HTMLInputElement).checked;
+    const useLower = (document.getElementById('pw-lower') as HTMLInputElement).checked;
+    const useDigits = (document.getElementById('pw-digits') as HTMLInputElement).checked;
+    const useSymbols = (document.getElementById('pw-symbols') as HTMLInputElement).checked;
+    const excludeSimilar = (document.getElementById('pw-exclude-similar') as HTMLInputElement).checked;
+
+    let charset = '';
+    if (useUpper) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (useLower) charset += 'abcdefghijklmnopqrstuvwxyz';
+    if (useDigits) charset += '0123456789';
+    if (useSymbols) charset += '!@#$%^&*()-_=+[]{}|;:,.<>?';
+    if (excludeSimilar) charset = charset.replace(/[l1O0]/g, '');
+
+    if (!charset) { alert('Select at least one character type.'); return; }
+
+    const passwords: string[] = [];
+    for (let p = 0; p < Math.min(count, 20); p++) {
+      const arr = new Uint32Array(len);
+      crypto.getRandomValues(arr);
+      passwords.push(Array.from(arr).map(v => charset[v % charset.length]).join(''));
+    }
+
+    const entropy = Math.floor(len * Math.log2(charset.length));
+
+    const list = document.getElementById('pw-list')!;
+    list.innerHTML = passwords.map(pw => `
+      <div class="flex items-center gap-sm rounded-xl border border-hairline bg-canvas-soft p-sm">
+        <code class="flex-1 font-mono text-body-md text-ink break-all">${pw}</code>
+        <button type="button" onclick="navigator.clipboard.writeText('${pw.replace(/'/g,"\\'")}');this.textContent='✓';setTimeout(()=>this.textContent='Copy',1500)" class="shrink-0 rounded-lg border border-hairline px-xs py-xxs text-caption hover:bg-link-bg-soft hover:border-link hover:text-link transition-colors">Copy</button>
+      </div>
+    `).join('');
+
+    document.getElementById('pw-entropy')!.textContent = entropy + ' bits';
+    document.getElementById('pw-charset')!.textContent = charset.length + ' chars';
+
+    const result = document.getElementById('pw-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  document.getElementById('pw-btn')!.addEventListener('click', generate);
+  document.getElementById('pw-again')!.addEventListener('click', generate);
+</script>

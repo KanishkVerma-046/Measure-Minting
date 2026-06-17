@@ -1,0 +1,118 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Grade Calculator — Weighted Average Grade | MeasureMinting" description="Calculate your weighted average grade from assignments, tests, and exams with custom weights." path="/calculators/grade/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Other</div>
+      <h1 class="text-display-lg text-ink">Grade Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate your weighted average grade from assignments, tests, and exams.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <div class="overflow-x-auto mb-md">
+          <table class="w-full text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline">
+                <th class="text-left py-xs pr-sm font-medium text-ink">Assignment</th>
+                <th class="text-left py-xs px-xs font-medium text-ink">Score (%)</th>
+                <th class="text-left py-xs px-xs font-medium text-ink">Weight (%)</th>
+              </tr>
+            </thead>
+            <tbody id="grade-tbody"></tbody>
+          </table>
+        </div>
+        <button id="add-grade-row" type="button" class="inline-flex items-center gap-xs rounded-xl border border-hairline bg-canvas px-md py-xs text-body-sm-strong hover:bg-link-bg-soft hover:border-link hover:text-link transition-colors mb-lg">
+          + Add row
+        </button>
+        <div class="calc-field">
+          <label class="calc-label" for="grade-needed">What grade do I need on the final to get ___?</label>
+          <div class="flex gap-sm">
+            <input class="calc-input" id="target-grade" type="number" min="0" max="100" step="0.1" placeholder="Target % (e.g. 90)" style="flex:1">
+            <input class="calc-input" id="final-weight" type="number" min="0" max="100" step="0.1" placeholder="Final weight %" style="flex:1">
+          </div>
+        </div>
+        <button id="calc-grade" type="button" class="calc-btn btn-gradient text-white">Calculate Grade</button>
+
+        <div id="grade-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Current Grade</div>
+            <div id="grade-current" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Letter grade</span><span id="grade-letter" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total weight used</span><span id="grade-weight-used" class="calc-result-value"></span></div>
+          <div id="grade-needed-row" class="calc-result-row hidden"><span class="calc-result-label">Score needed on final</span><span id="grade-needed-val" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function letterGrade(pct: number): string {
+    if (pct >= 97) return 'A+'; if (pct >= 93) return 'A'; if (pct >= 90) return 'A-';
+    if (pct >= 87) return 'B+'; if (pct >= 83) return 'B'; if (pct >= 80) return 'B-';
+    if (pct >= 77) return 'C+'; if (pct >= 73) return 'C'; if (pct >= 70) return 'C-';
+    if (pct >= 67) return 'D+'; if (pct >= 63) return 'D'; if (pct >= 60) return 'D-';
+    return 'F';
+  }
+
+  const defaultRows = [
+    ['Homework', '85', '20'],
+    ['Midterm', '78', '30'],
+    ['Quizzes', '92', '10'],
+    ['Final Project', '', '15'],
+    ['Final Exam', '', '25'],
+  ];
+
+  function addRow(name = '', score = '', weight = '') {
+    const tr = document.createElement('tr');
+    tr.className = 'grade-row border-b border-hairline';
+    tr.innerHTML = `
+      <td class="py-xs pr-sm"><input type="text" class="calc-input row-name" placeholder="Assignment" value="${name}" style="padding:6px 10px"></td>
+      <td class="py-xs px-xs"><input type="number" class="calc-input row-score" min="0" max="200" step="0.1" placeholder="0–100" value="${score}" style="padding:6px 10px;width:80px"></td>
+      <td class="py-xs px-xs"><input type="number" class="calc-input row-weight" min="0" max="100" step="0.1" placeholder="%" value="${weight}" style="padding:6px 10px;width:70px"></td>
+    `;
+    document.getElementById('grade-tbody')!.appendChild(tr);
+  }
+
+  defaultRows.forEach(([n, s, w]) => addRow(n, s, w));
+  document.getElementById('add-grade-row')!.addEventListener('click', () => addRow());
+
+  document.getElementById('calc-grade')!.addEventListener('click', () => {
+    let weightedSum = 0, totalWeight = 0;
+    document.querySelectorAll('.grade-row').forEach(row => {
+      const score = parseFloat((row.querySelector('.row-score') as HTMLInputElement).value);
+      const weight = parseFloat((row.querySelector('.row-weight') as HTMLInputElement).value);
+      if (!isNaN(score) && !isNaN(weight) && weight > 0) {
+        weightedSum += score * weight;
+        totalWeight += weight;
+      }
+    });
+
+    const current = totalWeight > 0 ? weightedSum / totalWeight : NaN;
+    if (isNaN(current)) return;
+
+    document.getElementById('grade-current')!.textContent = current.toFixed(2) + '%';
+    document.getElementById('grade-letter')!.textContent = letterGrade(current);
+    document.getElementById('grade-weight-used')!.textContent = totalWeight.toFixed(1) + '%';
+
+    const target = parseFloat((document.getElementById('target-grade') as HTMLInputElement).value);
+    const finalWeight = parseFloat((document.getElementById('final-weight') as HTMLInputElement).value);
+    const neededRow = document.getElementById('grade-needed-row')!;
+
+    if (!isNaN(target) && !isNaN(finalWeight) && finalWeight > 0) {
+      const needed = (target * 100 - weightedSum) / finalWeight;
+      document.getElementById('grade-needed-val')!.textContent = needed.toFixed(2) + '%' + (needed > 100 ? ' (not achievable)' : needed < 0 ? ' (already achieved!)' : '');
+      neededRow.classList.remove('hidden');
+    } else {
+      neededRow.classList.add('hidden');
+    }
+
+    const result = document.getElementById('grade-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

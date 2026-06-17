@@ -1,0 +1,109 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Date Calculator — Days Between Dates | MeasureMinting" description="Calculate the number of days, weeks, months, and years between two dates. Add or subtract days from a date." path="/calculators/date/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Other</div>
+      <h1 class="text-display-lg text-ink">Date Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Find the difference between two dates, or add/subtract days from a date.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem] space-y-md">
+
+      <div class="calc-card">
+        <h2 class="text-display-sm text-ink mb-lg">Date Difference</h2>
+        <form id="diff-form">
+          <div class="flex gap-sm">
+            <div class="calc-field flex-1"><label class="calc-label" for="d1">Start Date</label><input class="calc-input" id="d1" type="date"></div>
+            <div class="calc-field flex-1"><label class="calc-label" for="d2">End Date</label><input class="calc-input" id="d2" type="date"></div>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Difference</button>
+        </form>
+        <div id="diff-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">Days</span><span id="diff-days" class="calc-result-primary" style="font-size:1.4rem"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Weeks</span><span id="diff-weeks" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Months (approx)</span><span id="diff-months" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Years (approx)</span><span id="diff-years" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Weekdays only</span><span id="diff-weekdays" class="calc-result-value"></span></div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <h2 class="text-display-sm text-ink mb-lg">Add / Subtract Days</h2>
+        <form id="add-form">
+          <div class="calc-field"><label class="calc-label" for="add-date">Starting Date</label><input class="calc-input" id="add-date" type="date"></div>
+          <div class="flex gap-sm">
+            <div class="calc-field flex-1">
+              <label class="calc-label" for="add-days">Days</label>
+              <input class="calc-input" id="add-days" type="number" step="1" placeholder="30">
+            </div>
+            <div class="calc-field flex-1">
+              <label class="calc-label">Operation</label>
+              <select class="calc-select" id="add-op">
+                <option value="add">Add</option>
+                <option value="subtract">Subtract</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Date</button>
+        </form>
+        <div id="add-result" class="calc-result hidden">
+          <div class="text-center">
+            <div class="text-caption text-mute mb-xxs">Resulting Date</div>
+            <div id="add-date-result" class="calc-result-primary" style="font-size:1.4rem"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('diff-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const d1 = new Date((document.getElementById('d1') as HTMLInputElement).value);
+    const d2 = new Date((document.getElementById('d2') as HTMLInputElement).value);
+    if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return;
+
+    const ms = Math.abs(d2.getTime() - d1.getTime());
+    const days = Math.round(ms / 86400000);
+    const weeks = (days / 7).toFixed(1);
+    const months = (days / 30.44).toFixed(1);
+    const years = (days / 365.25).toFixed(2);
+
+    // Count weekdays
+    let weekdays = 0;
+    const start = d1 < d2 ? new Date(d1) : new Date(d2);
+    const end = d1 < d2 ? new Date(d2) : new Date(d1);
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      if (d.getDay() !== 0 && d.getDay() !== 6) weekdays++;
+    }
+
+    document.getElementById('diff-days')!.textContent = days.toLocaleString() + ' days';
+    document.getElementById('diff-weeks')!.textContent = weeks + ' weeks';
+    document.getElementById('diff-months')!.textContent = months + ' months';
+    document.getElementById('diff-years')!.textContent = years + ' years';
+    document.getElementById('diff-weekdays')!.textContent = weekdays.toLocaleString() + ' days';
+
+    const result = document.getElementById('diff-result')!;
+    result.classList.remove('hidden');
+  });
+
+  document.getElementById('add-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const startVal = (document.getElementById('add-date') as HTMLInputElement).value;
+    const days = parseInt((document.getElementById('add-days') as HTMLInputElement).value);
+    const op = (document.getElementById('add-op') as HTMLSelectElement).value;
+    if (!startVal || isNaN(days)) return;
+
+    const date = new Date(startVal);
+    date.setDate(date.getDate() + (op === 'add' ? days : -days));
+
+    document.getElementById('add-date-result')!.textContent = date.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    const result = document.getElementById('add-result')!;
+    result.classList.remove('hidden');
+  });
+</script>

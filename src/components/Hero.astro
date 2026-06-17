@@ -1,5 +1,4 @@
 ---
-// DESIGN.md `hero-band` (full) / `feature-mesh-band` (compact, for hub pages)
 import MeshGradient from "./MeshGradient.astro";
 
 interface Props {
@@ -10,7 +9,16 @@ interface Props {
 const { compact = false, class: className = "" } = Astro.props;
 ---
 
-<section class={["relative overflow-hidden bg-canvas", compact ? "px-md py-2xl sm:py-3xl sm:px-lg lg:py-5xl" : "px-md py-4xl sm:py-5xl sm:px-lg lg:py-section", className].join(" ")}>
+<section
+  class={[
+    "relative overflow-hidden",
+    compact
+      ? "px-md py-2xl sm:py-3xl sm:px-lg lg:py-5xl"
+      : "px-md py-4xl sm:py-5xl sm:px-lg lg:py-section",
+    className,
+  ].join(" ")}
+  style="background: linear-gradient(160deg, var(--color-canvas) 0%, var(--color-link-bg-soft) 60%, var(--color-canvas-soft-2) 100%);"
+>
   <MeshGradient />
   <div class="relative mx-auto max-w-[1400px] text-center">
     <slot name="badge" />

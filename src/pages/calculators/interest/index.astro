@@ -1,0 +1,66 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Interest Calculator — Simple Interest | MeasureMinting" description="Calculate simple interest on any principal amount with annual rate and time period." path="/calculators/interest/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Interest Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate simple interest: I = P × r × t</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="si-form">
+          <div class="calc-field">
+            <label class="calc-label" for="si-principal">Principal Amount ($)</label>
+            <input class="calc-input" id="si-principal" type="number" min="0" step="100" placeholder="10000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="si-rate">Annual Interest Rate (%)</label>
+            <input class="calc-input" id="si-rate" type="number" step="0.01" min="0" placeholder="5.0">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="si-years">Time Period (years)</label>
+            <input class="calc-input" id="si-years" type="number" min="0" step="0.5" placeholder="3">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Interest</button>
+        </form>
+        <div id="si-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Simple Interest</div>
+            <div id="si-interest" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Principal</span><span id="si-r-principal" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total amount (P + I)</span><span id="si-r-total" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Daily interest</span><span id="si-daily" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Monthly interest</span><span id="si-monthly" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('si-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const P = parseFloat((document.getElementById('si-principal') as HTMLInputElement).value);
+    const r = parseFloat((document.getElementById('si-rate') as HTMLInputElement).value) / 100;
+    const t = parseFloat((document.getElementById('si-years') as HTMLInputElement).value);
+
+    if (!P || isNaN(r) || !t) return;
+
+    const I = P * r * t;
+    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('si-interest')!.textContent = fmt(I);
+    document.getElementById('si-r-principal')!.textContent = fmt(P);
+    document.getElementById('si-r-total')!.textContent = fmt(P + I);
+    document.getElementById('si-daily')!.textContent = fmt(I / (t * 365));
+    document.getElementById('si-monthly')!.textContent = fmt(I / (t * 12));
+
+    const result = document.getElementById('si-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

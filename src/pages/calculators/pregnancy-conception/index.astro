@@ -1,0 +1,87 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Pregnancy Conception Calculator | MeasureMinting" description="Estimate your conception date from your due date or last menstrual period." path="/calculators/pregnancy-conception/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Health & Fitness</div>
+      <h1 class="text-display-lg text-ink">Pregnancy Conception Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Estimate when conception occurred based on your due date or LMP.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="pc-form">
+          <div class="mb-md">
+            <label class="calc-label mb-sm block">Calculate from:</label>
+            <div class="flex gap-sm flex-wrap">
+              <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="method" value="lmp" checked class="accent-link"> Last Menstrual Period</label>
+              <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="method" value="edd" class="accent-link"> Due Date</label>
+            </div>
+          </div>
+          <div id="lmp-field" class="calc-field">
+            <label class="calc-label" for="lmp">First day of LMP</label>
+            <input class="calc-input" id="lmp" type="date">
+          </div>
+          <div id="edd-field" class="calc-field hidden">
+            <label class="calc-label" for="edd">Estimated Due Date</label>
+            <input class="calc-input" id="edd" type="date">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Conception Date</button>
+        </form>
+        <div id="pc-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Estimated Conception Date</div>
+            <div id="conception-val" class="calc-result-primary" style="font-size:1.4rem"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Conception window (start)</span><span id="c-start" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Conception window (end)</span><span id="c-end" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Estimated due date</span><span id="edd-out" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="method"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const isLmp = (e.target as HTMLInputElement).value === 'lmp';
+      document.getElementById('lmp-field')!.classList.toggle('hidden', !isLmp);
+      document.getElementById('edd-field')!.classList.toggle('hidden', isLmp);
+    });
+  });
+
+  document.getElementById('pc-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const method = (document.querySelector('input[name="method"]:checked') as HTMLInputElement).value;
+    let lmp: Date, edd: Date;
+
+    if (method === 'lmp') {
+      const val = (document.getElementById('lmp') as HTMLInputElement).value;
+      if (!val) return;
+      lmp = new Date(val);
+      edd = new Date(lmp.getTime() + 280 * 86400000);
+    } else {
+      const val = (document.getElementById('edd') as HTMLInputElement).value;
+      if (!val) return;
+      edd = new Date(val);
+      lmp = new Date(edd.getTime() - 280 * 86400000);
+    }
+
+    const conception = new Date(lmp.getTime() + 14 * 86400000);
+    const cStart = new Date(lmp.getTime() + 11 * 86400000);
+    const cEnd = new Date(lmp.getTime() + 17 * 86400000);
+
+    const fmt = (d: Date) => d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+    document.getElementById('conception-val')!.textContent = fmt(conception);
+    document.getElementById('c-start')!.textContent = fmt(cStart);
+    document.getElementById('c-end')!.textContent = fmt(cEnd);
+    document.getElementById('edd-out')!.textContent = fmt(edd);
+
+    const result = document.getElementById('pc-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

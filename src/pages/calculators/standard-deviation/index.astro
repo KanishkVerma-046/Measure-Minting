@@ -1,0 +1,83 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Standard Deviation Calculator — Mean, Variance & SD | MeasureMinting" description="Calculate mean, variance, standard deviation, and more statistics for any data set." path="/calculators/standard-deviation/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Math</div>
+      <h1 class="text-display-lg text-ink">Standard Deviation Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate mean, median, variance, and standard deviation for any data set.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="sd-form">
+          <div class="calc-field">
+            <label class="calc-label" for="sd-data">Data Values (comma or space separated)</label>
+            <textarea class="calc-input" id="sd-data" rows="4" placeholder="e.g. 2, 4, 4, 4, 5, 5, 7, 9" style="resize:vertical"></textarea>
+          </div>
+          <div class="mb-md flex gap-sm">
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sd-type" value="population" checked class="accent-link"> Population (σ)</label>
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sd-type" value="sample" class="accent-link"> Sample (s)</label>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="sd-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Standard Deviation</div>
+            <div id="sd-value" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Count (n)</span><span id="sd-n" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Mean (μ)</span><span id="sd-mean" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Median</span><span id="sd-median" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Mode</span><span id="sd-mode" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Variance</span><span id="sd-variance" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Range</span><span id="sd-range" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Min / Max</span><span id="sd-minmax" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Sum</span><span id="sd-sum" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('sd-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const raw = (document.getElementById('sd-data') as HTMLTextAreaElement).value;
+    const data = raw.split(/[\s,;]+/).map(Number).filter(v => !isNaN(v) && v.toString() !== '');
+    if (data.length < 2) { alert('Enter at least 2 numbers.'); return; }
+
+    const isSample = (document.querySelector('input[name="sd-type"]:checked') as HTMLInputElement).value === 'sample';
+    const n = data.length;
+    const sum = data.reduce((a, b) => a + b, 0);
+    const mean = sum / n;
+    const variance = data.reduce((s, v) => s + (v - mean) ** 2, 0) / (isSample ? n - 1 : n);
+    const sd = Math.sqrt(variance);
+    const sorted = [...data].sort((a, b) => a - b);
+    const median = n % 2 === 0 ? (sorted[n/2-1] + sorted[n/2]) / 2 : sorted[Math.floor(n/2)];
+
+    // Mode
+    const freq: Record<number, number> = {};
+    data.forEach(v => { freq[v] = (freq[v] || 0) + 1; });
+    const maxFreq = Math.max(...Object.values(freq));
+    const modes = Object.entries(freq).filter(([, f]) => f === maxFreq).map(([v]) => v);
+    const modeStr = maxFreq === 1 ? 'No mode' : modes.join(', ');
+
+    const fmt = (v: number) => +v.toFixed(6) + '';
+    document.getElementById('sd-value')!.textContent = fmt(sd);
+    document.getElementById('sd-n')!.textContent = n.toString();
+    document.getElementById('sd-mean')!.textContent = fmt(mean);
+    document.getElementById('sd-median')!.textContent = fmt(median);
+    document.getElementById('sd-mode')!.textContent = modeStr;
+    document.getElementById('sd-variance')!.textContent = fmt(variance);
+    document.getElementById('sd-range')!.textContent = fmt(sorted[n-1] - sorted[0]);
+    document.getElementById('sd-minmax')!.textContent = `${fmt(sorted[0])} / ${fmt(sorted[n-1])}`;
+    document.getElementById('sd-sum')!.textContent = fmt(sum);
+
+    const result = document.getElementById('sd-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

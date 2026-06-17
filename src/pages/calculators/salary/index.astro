@@ -1,0 +1,96 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Salary Calculator — Hourly to Annual Converter | MeasureMinting" description="Convert salary between hourly, daily, weekly, bi-weekly, monthly, and annual pay rates." path="/calculators/salary/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Salary Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Convert between hourly, daily, weekly, bi-weekly, monthly, and annual pay.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="sal-form">
+          <div class="calc-field">
+            <label class="calc-label" for="sal-amount">Amount ($)</label>
+            <input class="calc-input" id="sal-amount" type="number" step="0.01" min="0" placeholder="50000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="sal-period">Pay Period</label>
+            <select class="calc-select" id="sal-period">
+              <option value="hourly">Hourly</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Bi-Weekly</option>
+              <option value="semimonthly">Semi-Monthly (24×/yr)</option>
+              <option value="monthly">Monthly</option>
+              <option value="annual" selected>Annual</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="sal-hours">Hours per week</label>
+            <input class="calc-input" id="sal-hours" type="number" min="1" max="168" step="0.5" placeholder="40">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="sal-weeks">Weeks per year</label>
+            <input class="calc-input" id="sal-weeks" type="number" min="1" max="52" placeholder="52">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Convert Salary</button>
+        </form>
+        <div id="sal-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">Hourly</span><span id="sal-hourly" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Daily</span><span id="sal-daily" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Weekly</span><span id="sal-weekly" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Bi-Weekly</span><span id="sal-biweekly" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Semi-Monthly</span><span id="sal-semimonthly" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Monthly</span><span id="sal-monthly" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label font-semibold">Annual</span><span id="sal-annual" class="calc-result-primary" style="font-size:1.4rem"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('sal-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const amount = parseFloat((document.getElementById('sal-amount') as HTMLInputElement).value);
+    const period = (document.getElementById('sal-period') as HTMLSelectElement).value;
+    const hoursPerWeek = parseFloat((document.getElementById('sal-hours') as HTMLInputElement).value) || 40;
+    const weeksPerYear = parseFloat((document.getElementById('sal-weeks') as HTMLInputElement).value) || 52;
+
+    if (!amount) return;
+
+    const hoursPerYear = hoursPerWeek * weeksPerYear;
+    let annual: number;
+
+    switch (period) {
+      case 'hourly': annual = amount * hoursPerYear; break;
+      case 'daily': annual = amount * (weeksPerYear * 5); break;
+      case 'weekly': annual = amount * weeksPerYear; break;
+      case 'biweekly': annual = amount * 26; break;
+      case 'semimonthly': annual = amount * 24; break;
+      case 'monthly': annual = amount * 12; break;
+      default: annual = amount;
+    }
+
+    const hourly = annual / hoursPerYear;
+    const daily = annual / (weeksPerYear * 5);
+    const weekly = annual / weeksPerYear;
+
+    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('sal-hourly')!.textContent = fmt(hourly);
+    document.getElementById('sal-daily')!.textContent = fmt(daily);
+    document.getElementById('sal-weekly')!.textContent = fmt(weekly);
+    document.getElementById('sal-biweekly')!.textContent = fmt(annual / 26);
+    document.getElementById('sal-semimonthly')!.textContent = fmt(annual / 24);
+    document.getElementById('sal-monthly')!.textContent = fmt(annual / 12);
+    document.getElementById('sal-annual')!.textContent = fmt(annual);
+
+    const result = document.getElementById('sal-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

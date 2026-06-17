@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Random Number Generator — Integers & Decimals | MeasureMinting" description="Generate random integers or decimal numbers in any range. Roll dice, pick numbers, or create random lists." path="/calculators/random-number/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Math</div>
+      <h1 class="text-display-lg text-ink">Random Number Generator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Generate random integers or decimal numbers in any range.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <div class="mb-md flex gap-sm">
+          <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="rng-type" value="integer" checked class="accent-link"> Integer</label>
+          <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="rng-type" value="decimal" class="accent-link"> Decimal</label>
+        </div>
+        <div class="flex gap-sm mb-md">
+          <div class="calc-field flex-1">
+            <label class="calc-label" for="rng-min">Minimum</label>
+            <input class="calc-input" id="rng-min" type="number" placeholder="1">
+          </div>
+          <div class="calc-field flex-1">
+            <label class="calc-label" for="rng-max">Maximum</label>
+            <input class="calc-input" id="rng-max" type="number" placeholder="100">
+          </div>
+          <div class="calc-field flex-1">
+            <label class="calc-label" for="rng-count">How many</label>
+            <input class="calc-input" id="rng-count" type="number" min="1" max="1000" placeholder="1">
+          </div>
+        </div>
+        <div id="decimal-opts" class="calc-field hidden">
+          <label class="calc-label" for="rng-decimals">Decimal places</label>
+          <input class="calc-input" id="rng-decimals" type="number" min="1" max="10" placeholder="2">
+        </div>
+        <button id="rng-btn" type="button" class="calc-btn btn-gradient text-white">Generate</button>
+
+        <div id="rng-result" class="calc-result hidden mt-lg">
+          <div class="text-center">
+            <div id="rng-single" class="calc-result-primary mb-sm"></div>
+            <div id="rng-list" class="text-body-md text-body font-mono leading-relaxed"></div>
+          </div>
+          <div class="mt-md text-center">
+            <button id="rng-again" type="button" class="inline-flex items-center gap-xs rounded-xl border border-link text-link px-md py-xs text-body-sm-strong hover:bg-link-bg-soft transition-colors">
+              Generate again
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="rng-type"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const isDecimal = (e.target as HTMLInputElement).value === 'decimal';
+      document.getElementById('decimal-opts')!.classList.toggle('hidden', !isDecimal);
+    });
+  });
+
+  function generate() {
+    const min = parseFloat((document.getElementById('rng-min') as HTMLInputElement).value);
+    const max = parseFloat((document.getElementById('rng-max') as HTMLInputElement).value);
+    const count = parseInt((document.getElementById('rng-count') as HTMLInputElement).value) || 1;
+    const isDecimal = (document.querySelector('input[name="rng-type"]:checked') as HTMLInputElement).value === 'decimal';
+    const decimals = parseInt((document.getElementById('rng-decimals') as HTMLInputElement).value) || 2;
+
+    if (isNaN(min) || isNaN(max) || min > max) { alert('Enter a valid min ≤ max.'); return; }
+
+    const nums: number[] = [];
+    for (let i = 0; i < Math.min(count, 1000); i++) {
+      const r = Math.random() * (max - min) + min;
+      nums.push(isDecimal ? parseFloat(r.toFixed(decimals)) : Math.floor(r) + (Math.random() < r - Math.floor(r) ? 1 : 0));
+    }
+
+    // Ensure integers are in range
+    const final = isDecimal ? nums : nums.map(n => Math.min(max, Math.max(min, n)));
+
+    const single = document.getElementById('rng-single')!;
+    const list = document.getElementById('rng-list')!;
+    const result = document.getElementById('rng-result')!;
+
+    if (count === 1) {
+      single.textContent = String(final[0]);
+      list.textContent = '';
+    } else {
+      single.textContent = '';
+      list.textContent = final.join(', ');
+    }
+
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Proper integer generation
+  function randInt(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  document.getElementById('rng-btn')!.addEventListener('click', generate);
+  document.getElementById('rng-again')!.addEventListener('click', generate);
+</script>

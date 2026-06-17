@@ -1,0 +1,80 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Sales Tax Calculator — Price Before & After Tax | MeasureMinting" description="Calculate the total price after sales tax, or find the pre-tax price from a post-tax amount." path="/calculators/sales-tax/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Sales Tax Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate price after tax, or find the pre-tax amount from a total.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <div class="mb-md flex gap-sm">
+          <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="mode" value="add" checked class="accent-link"> Add tax to price</label>
+          <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="mode" value="remove" class="accent-link"> Remove tax from total</label>
+        </div>
+        <form id="st-form">
+          <div class="calc-field" id="pretax-field">
+            <label class="calc-label" for="st-price">Price Before Tax ($)</label>
+            <input class="calc-input" id="st-price" type="number" step="0.01" min="0" placeholder="99.99">
+          </div>
+          <div class="calc-field hidden" id="posttax-field">
+            <label class="calc-label" for="st-total">Total with Tax ($)</label>
+            <input class="calc-input" id="st-total" type="number" step="0.01" min="0" placeholder="106.99">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="st-rate">Sales Tax Rate (%)</label>
+            <input class="calc-input" id="st-rate" type="number" step="0.001" min="0" placeholder="7.0">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="st-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">Pre-tax price</span><span id="st-pretax" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Tax amount</span><span id="st-taxamt" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total (with tax)</span><span id="st-posttax" class="calc-result-primary" style="font-size:1.4rem"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="mode"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const isAdd = (e.target as HTMLInputElement).value === 'add';
+      document.getElementById('pretax-field')!.classList.toggle('hidden', !isAdd);
+      document.getElementById('posttax-field')!.classList.toggle('hidden', isAdd);
+    });
+  });
+
+  document.getElementById('st-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const mode = (document.querySelector('input[name="mode"]:checked') as HTMLInputElement).value;
+    const rate = parseFloat((document.getElementById('st-rate') as HTMLInputElement).value) / 100;
+    if (isNaN(rate)) return;
+
+    let preTax: number, postTax: number;
+    if (mode === 'add') {
+      preTax = parseFloat((document.getElementById('st-price') as HTMLInputElement).value);
+      if (!preTax) return;
+      postTax = preTax * (1 + rate);
+    } else {
+      postTax = parseFloat((document.getElementById('st-total') as HTMLInputElement).value);
+      if (!postTax) return;
+      preTax = postTax / (1 + rate);
+    }
+
+    const taxAmt = postTax - preTax;
+    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('st-pretax')!.textContent = fmt(preTax);
+    document.getElementById('st-taxamt')!.textContent = fmt(taxAmt);
+    document.getElementById('st-posttax')!.textContent = fmt(postTax);
+
+    const result = document.getElementById('st-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

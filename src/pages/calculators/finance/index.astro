@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Finance Calculator — Time Value of Money (TVM) | MeasureMinting" description="Solve any time value of money problem: PV, FV, PMT, rate, or number of periods." path="/calculators/finance/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Finance Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Time Value of Money (TVM) solver — enter any four values to find the fifth.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <p class="text-body-sm text-body mb-md">Leave exactly one field blank. Use negative values for cash outflows.</p>
+        <form id="tvm-form">
+          <div class="calc-field">
+            <label class="calc-label" for="tvm-n">N — Number of Periods</label>
+            <input class="calc-input" id="tvm-n" type="number" step="0.01" placeholder="60">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="tvm-iy">I/Y — Annual Interest Rate (%)</label>
+            <input class="calc-input" id="tvm-iy" type="number" step="0.001" placeholder="5.0">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="tvm-pv">PV — Present Value ($)</label>
+            <input class="calc-input" id="tvm-pv" type="number" step="0.01" placeholder="-10000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="tvm-pmt">PMT — Payment per Period ($)</label>
+            <input class="calc-input" id="tvm-pmt" type="number" step="0.01" placeholder="0">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="tvm-fv">FV — Future Value ($)</label>
+            <input class="calc-input" id="tvm-fv" type="number" step="0.01" placeholder="Leave blank to solve">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="tvm-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">N (periods)</span><span id="tvm-r-n" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">I/Y (annual rate)</span><span id="tvm-r-iy" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">PV (present value)</span><span id="tvm-r-pv" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">PMT (payment)</span><span id="tvm-r-pmt" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">FV (future value)</span><span id="tvm-r-fv" class="calc-result-primary" style="font-size:1.4rem"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('tvm-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fields = ['tvm-n','tvm-iy','tvm-pv','tvm-pmt','tvm-fv'];
+    const vals = fields.map(id => {
+      const v = (document.getElementById(id) as HTMLInputElement).value;
+      return v === '' ? null : parseFloat(v);
+    });
+    const [N, IY, PV, PMT, FV] = vals;
+    const blanks = vals.filter(v => v === null).length;
+    if (blanks !== 1) { alert('Leave exactly one field blank.'); return; }
+
+    let rN = N!, rIY = IY!, rPV = PV!, rPMT = PMT!, rFV = FV!;
+    const r = () => rIY / 100 / 12;
+
+    if (FV === null) {
+      const rv = r();
+      rFV = rv === 0 ? -(rPV + rPMT * rN) : -(rPV * Math.pow(1+rv, rN) + rPMT * (Math.pow(1+rv,rN)-1)/rv);
+    } else if (PV === null) {
+      const rv = r();
+      rPV = rv === 0 ? -(rFV + rPMT * rN) : -(rFV / Math.pow(1+rv,rN) + rPMT * (1 - 1/Math.pow(1+rv,rN))/rv);
+    } else if (N === null) {
+      const rv = r();
+      if (rv === 0) { rN = -(rPV + rFV) / rPMT; }
+      else { rN = Math.log((-rFV * rv + rPMT) / (rPV * rv + rPMT)) / Math.log(1 + rv); }
+    } else if (PMT === null) {
+      const rv = r();
+      if (rv === 0) { rPMT = -(rPV + rFV) / rN; }
+      else { rPMT = -(rPV * Math.pow(1+rv,rN) + rFV) * rv / (Math.pow(1+rv,rN) - 1); }
+    } else if (IY === null) {
+      let rv = 0.005;
+      for (let i = 0; i < 200; i++) {
+        const pow = Math.pow(1+rv, rN);
+        const f = rPV * pow + rPMT * (pow-1)/rv + rFV;
+        const df = rN * rPV * Math.pow(1+rv, rN-1) + rPMT * (rv * rN * Math.pow(1+rv, rN-1) * rv - (pow-1)) / (rv*rv);
+        const newRv = rv - f/df;
+        if (Math.abs(newRv-rv) < 1e-10) { rv = newRv; break; }
+        rv = newRv;
+      }
+      rIY = rv * 12 * 100;
+    }
+
+    const fmt$ = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('tvm-r-n')!.textContent = rN.toFixed(2);
+    document.getElementById('tvm-r-iy')!.textContent = rIY.toFixed(3) + '%';
+    document.getElementById('tvm-r-pv')!.textContent = fmt$(rPV);
+    document.getElementById('tvm-r-pmt')!.textContent = fmt$(rPMT);
+    document.getElementById('tvm-r-fv')!.textContent = fmt$(rFV);
+
+    const result = document.getElementById('tvm-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

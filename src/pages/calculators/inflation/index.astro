@@ -1,0 +1,78 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Inflation Calculator — Purchasing Power Over Time | MeasureMinting" description="Calculate the impact of inflation on purchasing power. Find the equivalent value of money across different years." path="/calculators/inflation/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Inflation Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate how inflation erodes purchasing power over time.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="inf-form">
+          <div class="calc-field">
+            <label class="calc-label" for="inf-amount">Amount ($)</label>
+            <input class="calc-input" id="inf-amount" type="number" min="0" step="100" placeholder="1000">
+          </div>
+          <div class="flex gap-sm">
+            <div class="calc-field flex-1">
+              <label class="calc-label" for="inf-from-year">From Year</label>
+              <input class="calc-input" id="inf-from-year" type="number" min="1900" max="2100" placeholder="2000">
+            </div>
+            <div class="calc-field flex-1">
+              <label class="calc-label" for="inf-to-year">To Year</label>
+              <input class="calc-input" id="inf-to-year" type="number" min="1900" max="2100" placeholder="2024">
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="inf-rate">Annual Inflation Rate (%)</label>
+            <input class="calc-input" id="inf-rate" type="number" step="0.1" min="0" placeholder="3.5">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="inf-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Equivalent Value</div>
+            <div id="inf-value" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Original amount</span><span id="inf-original" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Years elapsed</span><span id="inf-years" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Cumulative inflation</span><span id="inf-cumulative" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Purchasing power change</span><span id="inf-change" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('inf-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const amount = parseFloat((document.getElementById('inf-amount') as HTMLInputElement).value);
+    const fromYear = parseInt((document.getElementById('inf-from-year') as HTMLInputElement).value);
+    const toYear = parseInt((document.getElementById('inf-to-year') as HTMLInputElement).value);
+    const rate = parseFloat((document.getElementById('inf-rate') as HTMLInputElement).value);
+
+    if (!amount || !fromYear || !toYear || isNaN(rate)) return;
+
+    const years = toYear - fromYear;
+    const multiplier = Math.pow(1 + rate / 100, years);
+    const equivalent = amount * multiplier;
+    const cumulative = (multiplier - 1) * 100;
+    const powerChange = (1 / multiplier - 1) * 100;
+
+    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('inf-value')!.textContent = fmt(equivalent);
+    document.getElementById('inf-original')!.textContent = fmt(amount);
+    document.getElementById('inf-years')!.textContent = Math.abs(years) + ' years';
+    document.getElementById('inf-cumulative')!.textContent = cumulative.toFixed(1) + '%';
+    document.getElementById('inf-change')!.textContent = powerChange.toFixed(1) + '%';
+
+    const result = document.getElementById('inf-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

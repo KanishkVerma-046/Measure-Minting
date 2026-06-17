@@ -1,0 +1,119 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Concrete Calculator — Volume for Slabs, Footings & Columns | MeasureMinting" description="Calculate the volume of concrete needed for slabs, footings, columns, and steps in cubic yards and cubic meters." path="/calculators/concrete/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Other</div>
+      <h1 class="text-display-lg text-ink">Concrete Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate concrete volume for slabs, footings, columns, and steps.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <div class="mb-lg">
+          <label class="calc-label mb-sm block">Shape</label>
+          <div class="flex flex-wrap gap-sm" id="shape-selector">
+            {['Slab', 'Footing', 'Column', 'Round Slab'].map((s, i) => (
+              <label class={`shape-btn flex-1 text-center rounded-xl border py-sm cursor-pointer text-body-sm-strong transition-colors ${i===0 ? 'bg-link-bg-soft border-link text-link' : 'border-hairline hover:bg-link-bg-soft hover:border-link hover:text-link'}`}>
+                <input type="radio" name="shape" value={s.toLowerCase().replace(' ','-')} class="sr-only" checked={i===0}> {s}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <form id="concrete-form">
+          <div id="rect-fields">
+            <div class="flex gap-sm">
+              <div class="calc-field flex-1"><label class="calc-label" for="length">Length (ft)</label><input class="calc-input" id="length" type="number" step="0.01" min="0" placeholder="20"></div>
+              <div class="calc-field flex-1"><label class="calc-label" for="width">Width (ft)</label><input class="calc-input" id="width" type="number" step="0.01" min="0" placeholder="10"></div>
+            </div>
+          </div>
+          <div id="round-fields" class="hidden">
+            <div class="calc-field"><label class="calc-label" for="diameter">Diameter (ft)</label><input class="calc-input" id="diameter" type="number" step="0.01" min="0" placeholder="5"></div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="depth">Depth / Thickness (inches)</label>
+            <input class="calc-input" id="depth" type="number" step="0.1" min="0" placeholder="4">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="qty">Number of units</label>
+            <input class="calc-input" id="qty" type="number" min="1" placeholder="1">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Concrete</button>
+        </form>
+
+        <div id="concrete-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Volume</div>
+            <div id="vol-yd3" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Cubic meters</span><span id="vol-m3" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Cubic feet</span><span id="vol-ft3" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">With 10% waste</span><span id="vol-waste" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">80-lb bags needed (~0.45 ft³/bag)</span><span id="bags-80" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">60-lb bags needed (~0.34 ft³/bag)</span><span id="bags-60" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="shape"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const v = (e.target as HTMLInputElement).value;
+      document.getElementById('rect-fields')!.classList.toggle('hidden', v === 'round-slab');
+      document.getElementById('round-fields')!.classList.toggle('hidden', v !== 'round-slab');
+    });
+  });
+
+  // Highlight selected shape button
+  document.querySelectorAll('input[name="shape"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.querySelectorAll('.shape-btn').forEach(btn => {
+        const isChecked = (btn.querySelector('input') as HTMLInputElement)?.checked;
+        btn.classList.toggle('bg-link-bg-soft', isChecked);
+        btn.classList.toggle('border-link', isChecked);
+        btn.classList.toggle('text-link', isChecked);
+        btn.classList.toggle('border-hairline', !isChecked);
+      });
+    });
+  });
+
+  document.getElementById('concrete-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const shape = (document.querySelector('input[name="shape"]:checked') as HTMLInputElement).value;
+    const depthIn = parseFloat((document.getElementById('depth') as HTMLInputElement).value);
+    const qty = parseFloat((document.getElementById('qty') as HTMLInputElement).value) || 1;
+    const depthFt = depthIn / 12;
+
+    let volFt3: number;
+    if (shape === 'round-slab') {
+      const d = parseFloat((document.getElementById('diameter') as HTMLInputElement).value);
+      if (!d || !depthIn) return;
+      volFt3 = Math.PI * (d/2) ** 2 * depthFt * qty;
+    } else {
+      const l = parseFloat((document.getElementById('length') as HTMLInputElement).value);
+      const w = parseFloat((document.getElementById('width') as HTMLInputElement).value);
+      if (!l || !w || !depthIn) return;
+      volFt3 = l * w * depthFt * qty;
+    }
+
+    const volYd3 = volFt3 / 27;
+    const volM3 = volFt3 * 0.0283168;
+    const withWaste = volYd3 * 1.10;
+
+    document.getElementById('vol-yd3')!.textContent = volYd3.toFixed(2) + ' yd³';
+    document.getElementById('vol-m3')!.textContent = volM3.toFixed(2) + ' m³';
+    document.getElementById('vol-ft3')!.textContent = volFt3.toFixed(2) + ' ft³';
+    document.getElementById('vol-waste')!.textContent = withWaste.toFixed(2) + ' yd³';
+    document.getElementById('bags-80')!.textContent = Math.ceil(volFt3 / 0.45).toString();
+    document.getElementById('bags-60')!.textContent = Math.ceil(volFt3 / 0.34).toString();
+
+    const result = document.getElementById('concrete-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

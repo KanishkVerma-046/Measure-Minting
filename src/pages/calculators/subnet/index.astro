@@ -1,0 +1,96 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Subnet Calculator — CIDR, Network Range & Host Count | MeasureMinting" description="Calculate subnet information: network address, broadcast, host range, and usable host count from an IP/CIDR." path="/calculators/subnet/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Other</div>
+      <h1 class="text-display-lg text-ink">Subnet Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate network address, broadcast address, host range, and subnet mask from CIDR notation.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="subnet-form">
+          <div class="calc-field">
+            <label class="calc-label" for="cidr">IP Address / CIDR (e.g. 192.168.1.0/24)</label>
+            <input class="calc-input" id="cidr" type="text" placeholder="192.168.1.0/24" autocomplete="off" spellcheck="false">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Subnet</button>
+        </form>
+        <div id="subnet-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">IP Address</span><span id="sn-ip" class="calc-result-value font-mono"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Subnet Mask</span><span id="sn-mask" class="calc-result-value font-mono"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Wildcard Mask</span><span id="sn-wild" class="calc-result-value font-mono"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Network Address</span><span id="sn-network" class="calc-result-value font-mono"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Broadcast Address</span><span id="sn-broadcast" class="calc-result-value font-mono"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">First Usable Host</span><span id="sn-first" class="calc-result-value font-mono"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Last Usable Host</span><span id="sn-last" class="calc-result-value font-mono"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Usable Hosts</span><span id="sn-hosts" class="calc-result-primary" style="font-size:1.4rem"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total Addresses</span><span id="sn-total" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">IP Class</span><span id="sn-class" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Binary Subnet Mask</span><span id="sn-binary" class="calc-result-value font-mono text-caption"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function ipToLong(ip: string): number {
+    return ip.split('.').reduce((acc, oct) => (acc << 8) + parseInt(oct), 0) >>> 0;
+  }
+  function longToIp(n: number): string {
+    return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+  }
+  function toBinary(n: number): string {
+    return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255]
+      .map(o => o.toString(2).padStart(8,'0')).join('.');
+  }
+
+  document.getElementById('subnet-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = (document.getElementById('cidr') as HTMLInputElement).value.trim();
+    const match = input.match(/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})$/);
+    if (!match) { alert('Enter a valid IP/CIDR, e.g. 192.168.1.0/24'); return; }
+
+    const ip = match[1];
+    const prefix = parseInt(match[2]);
+    if (prefix < 0 || prefix > 32) { alert('Prefix must be 0–32'); return; }
+
+    const mask = prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+    const ipLong = ipToLong(ip);
+    const network = (ipLong & mask) >>> 0;
+    const broadcast = (network | (~mask >>> 0)) >>> 0;
+    const firstHost = prefix < 31 ? network + 1 : network;
+    const lastHost = prefix < 31 ? broadcast - 1 : broadcast;
+    const totalHosts = Math.pow(2, 32 - prefix);
+    const usableHosts = prefix <= 30 ? totalHosts - 2 : totalHosts;
+    const wildcard = (~mask) >>> 0;
+
+    // IP class
+    const first = ipLong >>> 24;
+    let cls = 'E';
+    if (first < 128) cls = 'A';
+    else if (first < 192) cls = 'B';
+    else if (first < 224) cls = 'C';
+    else if (first < 240) cls = 'D (Multicast)';
+
+    document.getElementById('sn-ip')!.textContent = ip + '/' + prefix;
+    document.getElementById('sn-mask')!.textContent = longToIp(mask);
+    document.getElementById('sn-wild')!.textContent = longToIp(wildcard);
+    document.getElementById('sn-network')!.textContent = longToIp(network);
+    document.getElementById('sn-broadcast')!.textContent = longToIp(broadcast);
+    document.getElementById('sn-first')!.textContent = longToIp(firstHost);
+    document.getElementById('sn-last')!.textContent = longToIp(lastHost);
+    document.getElementById('sn-hosts')!.textContent = usableHosts.toLocaleString();
+    document.getElementById('sn-total')!.textContent = totalHosts.toLocaleString();
+    document.getElementById('sn-class')!.textContent = 'Class ' + cls;
+    document.getElementById('sn-binary')!.textContent = toBinary(mask);
+
+    const result = document.getElementById('subnet-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

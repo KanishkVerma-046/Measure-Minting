@@ -1,0 +1,93 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Due Date Calculator — Estimated Delivery Date | MeasureMinting" description="Calculate your estimated due date (EDD) from your last menstrual period or conception date." path="/calculators/due-date/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Health & Fitness</div>
+      <h1 class="text-display-lg text-ink">Due Date Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate your estimated due date using Naegele's rule.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="dd-form">
+          <div class="mb-md">
+            <label class="calc-label mb-sm block">Calculate from:</label>
+            <div class="flex gap-sm">
+              <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="method" value="lmp" checked class="accent-link"> Last Menstrual Period</label>
+              <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="method" value="conception" class="accent-link"> Conception Date</label>
+            </div>
+          </div>
+          <div id="lmp-field" class="calc-field">
+            <label class="calc-label" for="lmp">First day of LMP</label>
+            <input class="calc-input" id="lmp" type="date">
+          </div>
+          <div id="conception-field" class="calc-field hidden">
+            <label class="calc-label" for="conception-date">Conception Date</label>
+            <input class="calc-input" id="conception-date" type="date">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Due Date</button>
+        </form>
+        <div id="dd-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Estimated Due Date</div>
+            <div id="edd-value" class="calc-result-primary" style="font-size:1.5rem"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Due date (approx)</span><span id="edd-long" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Gestational age today</span><span id="gest-age" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Days remaining</span><span id="days-rem" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">End of 1st trimester</span><span id="t1" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">End of 2nd trimester</span><span id="t2" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="method"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const isLmp = (e.target as HTMLInputElement).value === 'lmp';
+      document.getElementById('lmp-field')!.classList.toggle('hidden', !isLmp);
+      document.getElementById('conception-field')!.classList.toggle('hidden', isLmp);
+    });
+  });
+
+  document.getElementById('dd-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const method = (document.querySelector('input[name="method"]:checked') as HTMLInputElement).value;
+    let lmp: Date;
+
+    if (method === 'lmp') {
+      const val = (document.getElementById('lmp') as HTMLInputElement).value;
+      if (!val) return;
+      lmp = new Date(val);
+    } else {
+      const val = (document.getElementById('conception-date') as HTMLInputElement).value;
+      if (!val) return;
+      lmp = new Date(new Date(val).getTime() - 14 * 86400000);
+    }
+
+    const today = new Date();
+    const edd = new Date(lmp.getTime() + 280 * 86400000);
+    const t1End = new Date(lmp.getTime() + 84 * 86400000);
+    const t2End = new Date(lmp.getTime() + 189 * 86400000);
+    const diffDays = Math.floor((today.getTime() - lmp.getTime()) / 86400000);
+    const weeks = Math.floor(diffDays / 7), days = diffDays % 7;
+    const daysRem = Math.max(0, Math.floor((edd.getTime() - today.getTime()) / 86400000));
+
+    const fmt = (d: Date) => d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+    document.getElementById('edd-value')!.textContent = fmt(edd);
+    document.getElementById('edd-long')!.textContent = fmt(edd);
+    document.getElementById('gest-age')!.textContent = `${weeks} weeks, ${days} days`;
+    document.getElementById('days-rem')!.textContent = `${daysRem} days`;
+    document.getElementById('t1')!.textContent = fmt(t1End);
+    document.getElementById('t2')!.textContent = fmt(t2End);
+
+    const result = document.getElementById('dd-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

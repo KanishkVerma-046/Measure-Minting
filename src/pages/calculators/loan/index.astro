@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Loan Calculator — Monthly Payment & Total Cost | MeasureMinting" description="Calculate loan monthly payments, total interest, and payoff schedule for personal or student loans." path="/calculators/loan/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Loan Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate your monthly loan payment, total interest, and overall cost of borrowing.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="loan-form">
+          <div class="calc-field">
+            <label class="calc-label" for="loan-amount">Loan Amount ($)</label>
+            <input class="calc-input" id="loan-amount" type="number" min="0" step="500" placeholder="25000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="loan-rate">Annual Interest Rate (%)</label>
+            <input class="calc-input" id="loan-rate" type="number" step="0.01" min="0" placeholder="8.5">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="loan-term-yr">Loan Term</label>
+            <div class="flex gap-sm">
+              <input class="calc-input" id="loan-term-yr" type="number" min="0" placeholder="3" style="flex:1">
+              <span class="flex items-center text-body-sm text-mute px-xs">years</span>
+              <input class="calc-input" id="loan-term-mo" type="number" min="0" max="11" placeholder="0" style="flex:1">
+              <span class="flex items-center text-body-sm text-mute px-xs">months</span>
+            </div>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="loan-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Monthly Payment</div>
+            <div id="l-monthly" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Total of payments</span><span id="l-total" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total interest paid</span><span id="l-interest" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Loan amount</span><span id="l-principal" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('loan-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const P = parseFloat((document.getElementById('loan-amount') as HTMLInputElement).value);
+    const rate = parseFloat((document.getElementById('loan-rate') as HTMLInputElement).value);
+    const yrs = parseInt((document.getElementById('loan-term-yr') as HTMLInputElement).value) || 0;
+    const mos = parseInt((document.getElementById('loan-term-mo') as HTMLInputElement).value) || 0;
+    const n = yrs * 12 + mos;
+
+    if (!P || !n) return;
+
+    const r = rate / 100 / 12;
+    const payment = r === 0 ? P / n : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const total = payment * n;
+    const interest = total - P;
+
+    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('l-monthly')!.textContent = fmt(payment);
+    document.getElementById('l-total')!.textContent = fmt(total);
+    document.getElementById('l-interest')!.textContent = fmt(interest);
+    document.getElementById('l-principal')!.textContent = fmt(P);
+
+    const result = document.getElementById('loan-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

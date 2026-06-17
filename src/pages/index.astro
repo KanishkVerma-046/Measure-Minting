@@ -30,28 +30,37 @@ const features = [
     body: "Fast, accessible, and fully responsive — keyboard-friendly from the first tab stop.",
   },
   {
-    title: "Advanced calculator",
-    body: "Beyond unit conversion — evaluate expressions, compute derivatives, and run numerical integrations.",
+    title: "38+ calculators",
+    body: "Financial, health, math, and everyday calculators — all free, all in your browser.",
   },
+];
+
+const featuredCalcs = [
+  { label: "BMI Calculator", href: "/calculators/bmi/", category: "Health", description: "Body Mass Index from height & weight" },
+  { label: "Mortgage Calculator", href: "/calculators/mortgage/", category: "Financial", description: "Monthly payment & total interest" },
+  { label: "Compound Interest", href: "/calculators/compound-interest/", category: "Financial", description: "Growth over time with compounding" },
+  { label: "Age Calculator", href: "/calculators/age/", category: "Other", description: "Exact age from birthdate" },
+  { label: "Percentage Calculator", href: "/calculators/percentage/", category: "Math", description: "Solve any percentage problem" },
+  { label: "Calorie Calculator", href: "/calculators/calorie/", category: "Health", description: "Daily calorie needs (TDEE)" },
 ];
 ---
 
 <BaseLayout
-  title="MeasureMinting — Free Online Unit Converter"
-  description="Convert length, weight, temperature, volume, area, and speed instantly. Fast, accurate unit conversion with a scientific calculator."
+  title="MeasureMinting — Free Online Unit Converter & Calculators"
+  description="Convert length, weight, temperature, volume, area, and speed instantly. Plus 38+ free calculators for finance, health, math, and more."
   path="/"
 >
   <Hero>
     <Fragment slot="badge">
-      <Badge>Now converting 6 categories, 50+ units</Badge>
+      <Badge>6 converter categories · 38+ calculators</Badge>
     </Fragment>
-    <Fragment slot="title">Convert any unit, instantly.</Fragment>
+    <Fragment slot="title">Convert any unit, calculate anything.</Fragment>
     <Fragment slot="subtitle">
-      The fast, accurate unit converter for length, weight, temperature, volume, area, and speed.
+      The fast, accurate unit converter and calculator suite for everyday use — finance, health, math, and more.
     </Fragment>
     <Fragment slot="actions">
-      <Button href="/all-converters/" variant="primary">Browse all converters</Button>
-      <Button href="/length/" variant="secondary">Start with Length</Button>
+      <Button href="/all-converters/" variant="primary">Browse converters</Button>
+      <Button href="/calculators/" variant="secondary">All calculators</Button>
     </Fragment>
 
     <Card variant="marketing-large" class="mx-auto max-w-[42rem] text-left">
@@ -59,14 +68,15 @@ const features = [
     </Card>
   </Hero>
 
+  <!-- Converter categories -->
   <section class="px-md py-4xl sm:px-lg">
     <div class="mx-auto max-w-[1400px]">
-      <h2 class="text-display-lg text-ink">Browse by category</h2>
+      <h2 class="text-display-lg text-ink">Browse converters</h2>
       <div class="mt-lg grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-3">
         {
           CATEGORIES.map((category) => (
             <a href={categoryPath(category.id)}>
-              <Card variant="marketing" class="h-full transition-shadow hover:shadow-level-4">
+              <Card variant="marketing" class="h-full transition-all hover:shadow-level-4 hover:-translate-y-px">
                 <h3 class="text-display-sm text-ink">{category.label}</h3>
                 <p class="mt-xs text-body-md text-body">{category.description}</p>
                 <p class="mt-sm text-body-sm-strong text-link">{category.units.length} units →</p>
@@ -78,6 +88,7 @@ const features = [
     </div>
   </section>
 
+  <!-- Popular conversions -->
   <section class="bg-canvas-soft px-md py-4xl sm:px-lg">
     <div class="mx-auto max-w-[1400px]">
       <h2 class="text-display-lg text-ink">Popular conversions</h2>
@@ -86,7 +97,7 @@ const features = [
           featuredPairs.map((pair) => (
             <a
               href={pair.path}
-              class="group inline-flex items-center gap-xs rounded-md border border-hairline bg-canvas px-sm py-xs text-body-sm-strong text-ink shadow-level-1 transition-all hover:border-link hover:text-link hover:shadow-level-3"
+              class="group inline-flex items-center gap-xs rounded-xl border border-hairline bg-canvas px-sm py-xs text-body-sm-strong text-ink shadow-level-1 transition-all hover:border-link hover:text-link hover:shadow-level-3 hover:-translate-y-px"
             >
               {pair.label}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="opacity-40 transition-opacity group-hover:opacity-100"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -97,9 +108,35 @@ const features = [
     </div>
   </section>
 
+  <!-- Featured Calculators -->
   <section class="px-md py-4xl sm:px-lg">
     <div class="mx-auto max-w-[1400px]">
-      <div class="flex flex-col items-start gap-lg rounded-xl border border-hairline bg-canvas p-2xl shadow-level-2 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-end justify-between">
+        <h2 class="text-display-lg text-ink">Featured calculators</h2>
+        <a href="/calculators/" class="text-body-sm-strong text-link hover:text-link-deep">View all 38 →</a>
+      </div>
+      <div class="mt-lg grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-3">
+        {featuredCalcs.map((calc) => (
+          <a href={calc.href}>
+            <Card variant="marketing" class="h-full transition-all hover:shadow-level-4 hover:-translate-y-px">
+              <div class="mb-xs inline-flex items-center rounded-full bg-link-bg-soft px-xs py-xxs text-caption font-medium text-link">
+                {calc.category}
+              </div>
+              <h3 class="text-display-sm text-ink">{calc.label}</h3>
+              <p class="mt-xs text-body-sm text-body">{calc.description}</p>
+              <p class="mt-sm text-body-sm-strong text-link">Calculate →</p>
+            </Card>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Scientific Calculator CTA -->
+  <section class="px-md pb-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <div class="flex flex-col items-start gap-lg rounded-2xl border border-hairline bg-canvas p-2xl shadow-level-2 sm:flex-row sm:items-center sm:justify-between"
+        style="background: linear-gradient(135deg, var(--color-canvas) 0%, var(--color-link-bg-soft) 100%);">
         <div>
           <h2 class="text-display-md text-ink">Scientific Calculator</h2>
           <p class="mt-xs max-w-[48ch] text-body-md text-body">
@@ -107,17 +144,18 @@ const features = [
           </p>
           <div class="mt-sm flex flex-wrap gap-xs">
             {["sin / cos / tan", "d/dx Derivatives", "∫ Integration", "log / sqrt / exp"].map((tag) => (
-              <span class="rounded-md border border-hairline bg-canvas-soft px-xs py-1 text-caption text-mute">{tag}</span>
+              <span class="rounded-lg border border-hairline bg-canvas px-xs py-1 text-caption text-mute">{tag}</span>
             ))}
           </div>
         </div>
-        <a href="/calculator/" class="shrink-0 inline-flex h-11 items-center rounded-md bg-primary px-lg text-button-lg text-on-primary transition-opacity hover:opacity-80">
+        <a href="/calculator/" class="shrink-0 btn-gradient text-white rounded-xl inline-flex items-center px-lg py-sm text-button-lg font-medium">
           Open Calculator
         </a>
       </div>
     </div>
   </section>
 
+  <!-- Why section -->
   <section class="px-md py-5xl sm:px-lg">
     <div class="mx-auto max-w-[1400px]">
       <h2 class="text-center text-display-lg text-ink">Why MeasureMinting</h2>

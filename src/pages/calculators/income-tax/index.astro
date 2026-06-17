@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Income Tax Calculator — US Federal Tax Estimate | MeasureMinting" description="Estimate your US federal income tax liability based on 2024 tax brackets." path="/calculators/income-tax/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Income Tax Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Estimate your US federal income tax using 2024 tax brackets.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="tax-form">
+          <div class="calc-field">
+            <label class="calc-label" for="gross-income">Annual Gross Income ($)</label>
+            <input class="calc-input" id="gross-income" type="number" min="0" step="1000" placeholder="75000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="filing-status">Filing Status</label>
+            <select class="calc-select" id="filing-status">
+              <option value="single">Single</option>
+              <option value="married-joint">Married Filing Jointly</option>
+              <option value="married-separate">Married Filing Separately</option>
+              <option value="head">Head of Household</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="deductions">Additional Deductions ($)</label>
+            <input class="calc-input" id="deductions" type="number" min="0" step="500" placeholder="0">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Estimate Tax</button>
+        </form>
+        <div id="tax-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Estimated Federal Tax</div>
+            <div id="tax-amount" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Gross income</span><span id="tax-gross" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Standard deduction</span><span id="tax-std-ded" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Taxable income</span><span id="tax-taxable" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Effective tax rate</span><span id="tax-effective" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Marginal tax rate</span><span id="tax-marginal" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Take-home pay (annual)</span><span id="tax-takehome" class="calc-result-value" style="color:var(--color-success)"></span></div>
+        </div>
+        <p class="mt-md text-caption text-mute">Estimates are for informational purposes only and do not include state taxes, FICA, or other deductions.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // 2024 US federal tax brackets
+  const brackets: Record<string, [number, number][]> = {
+    'single': [[0,0.10],[11600,0.12],[47150,0.22],[100525,0.24],[191950,0.32],[243725,0.35],[609350,0.37]],
+    'married-joint': [[0,0.10],[23200,0.12],[94300,0.22],[201050,0.24],[383900,0.32],[487450,0.35],[731200,0.37]],
+    'married-separate': [[0,0.10],[11600,0.12],[47150,0.22],[100525,0.24],[191950,0.32],[243725,0.35],[365600,0.37]],
+    'head': [[0,0.10],[16550,0.12],[63100,0.22],[100500,0.24],[191950,0.32],[243700,0.35],[609350,0.37]],
+  };
+  const standardDeductions: Record<string, number> = {
+    'single': 14600, 'married-joint': 29200, 'married-separate': 14600, 'head': 21900
+  };
+
+  function calcTax(taxable: number, status: string): [number, number] {
+    const bkts = brackets[status];
+    let tax = 0, marginal = 0;
+    for (let i = 0; i < bkts.length; i++) {
+      const [lo, rate] = bkts[i];
+      const hi = i + 1 < bkts.length ? bkts[i + 1][0] : Infinity;
+      if (taxable > lo) {
+        tax += Math.min(taxable, hi) * rate - lo * rate;
+        marginal = rate;
+      }
+    }
+    return [tax, marginal];
+  }
+
+  document.getElementById('tax-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const gross = parseFloat((document.getElementById('gross-income') as HTMLInputElement).value);
+    const status = (document.getElementById('filing-status') as HTMLSelectElement).value;
+    const extraDed = parseFloat((document.getElementById('deductions') as HTMLInputElement).value) || 0;
+
+    if (!gross) return;
+
+    const stdDed = standardDeductions[status];
+    const taxable = Math.max(0, gross - stdDed - extraDed);
+    const [tax, marginal] = calcTax(taxable, status);
+
+    const fmt = (v: number) => '$' + Math.round(v).toLocaleString('en-US');
+    document.getElementById('tax-amount')!.textContent = fmt(tax);
+    document.getElementById('tax-gross')!.textContent = fmt(gross);
+    document.getElementById('tax-std-ded')!.textContent = fmt(stdDed);
+    document.getElementById('tax-taxable')!.textContent = fmt(taxable);
+    document.getElementById('tax-effective')!.textContent = ((tax / gross) * 100).toFixed(1) + '%';
+    document.getElementById('tax-marginal')!.textContent = (marginal * 100) + '%';
+    document.getElementById('tax-takehome')!.textContent = fmt(gross - tax);
+
+    const result = document.getElementById('tax-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

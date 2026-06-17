@@ -1,0 +1,117 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Triangle Calculator — Sides, Angles & Area | MeasureMinting" description="Solve any triangle given two sides and an angle, two angles and a side, or all three sides (SSS, SAS, AAS, ASA)." path="/calculators/triangle/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Math</div>
+      <h1 class="text-display-lg text-ink">Triangle Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Solve any triangle from SSS, SAS, ASA, AAS, or SSA inputs using the Law of Cosines and Sines.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="tri-form">
+          <p class="text-body-sm text-body mb-md">Enter at least three values (at least one must be a side). Angles in degrees.</p>
+          <div class="grid grid-cols-2 gap-sm">
+            <div class="calc-field"><label class="calc-label" for="side-a">Side a</label><input class="calc-input" id="side-a" type="number" step="any" min="0" placeholder=""></div>
+            <div class="calc-field"><label class="calc-label" for="angle-A">Angle A (°)</label><input class="calc-input" id="angle-A" type="number" step="any" min="0" max="180" placeholder=""></div>
+            <div class="calc-field"><label class="calc-label" for="side-b">Side b</label><input class="calc-input" id="side-b" type="number" step="any" min="0" placeholder=""></div>
+            <div class="calc-field"><label class="calc-label" for="angle-B">Angle B (°)</label><input class="calc-input" id="angle-B" type="number" step="any" min="0" max="180" placeholder=""></div>
+            <div class="calc-field"><label class="calc-label" for="side-c">Side c</label><input class="calc-input" id="side-c" type="number" step="any" min="0" placeholder=""></div>
+            <div class="calc-field"><label class="calc-label" for="angle-C">Angle C (°)</label><input class="calc-input" id="angle-C" type="number" step="any" min="0" max="180" placeholder=""></div>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Solve Triangle</button>
+        </form>
+        <div id="tri-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">Side a</span><span id="r-a" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Side b</span><span id="r-b" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Side c</span><span id="r-c" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Angle A</span><span id="r-A" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Angle B</span><span id="r-B" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Angle C</span><span id="r-C" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Area</span><span id="r-area" class="calc-result-primary" style="font-size:1.4rem"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Perimeter</span><span id="r-perim" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const R = Math.PI / 180;
+  const D = 180 / Math.PI;
+
+  document.getElementById('tri-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const get = (id: string) => { const v = (document.getElementById(id) as HTMLInputElement).value; return v === '' ? NaN : parseFloat(v); };
+    let a = get('side-a'), b = get('side-b'), c = get('side-c');
+    let A = get('angle-A'), B = get('angle-B'), C = get('angle-C');
+
+    // Supplement known angles
+    const knownAngles = [A, B, C].filter(v => !isNaN(v));
+    if (knownAngles.length === 2) {
+      const sum = knownAngles.reduce((s, v) => s + v, 0);
+      if (isNaN(A)) A = 180 - sum;
+      else if (isNaN(B)) B = 180 - sum;
+      else C = 180 - sum;
+    }
+
+    // SSS
+    if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
+      A = Math.acos((b*b + c*c - a*a) / (2*b*c)) * D;
+      B = Math.acos((a*a + c*c - b*b) / (2*a*c)) * D;
+      C = 180 - A - B;
+    }
+    // SAS (two sides + included angle)
+    else if (!isNaN(a) && !isNaN(b) && !isNaN(C)) {
+      c = Math.sqrt(a*a + b*b - 2*a*b*Math.cos(C*R));
+      A = Math.asin(a * Math.sin(C*R) / c) * D;
+      B = 180 - A - C;
+    } else if (!isNaN(a) && !isNaN(c) && !isNaN(B)) {
+      b = Math.sqrt(a*a + c*c - 2*a*c*Math.cos(B*R));
+      A = Math.asin(a * Math.sin(B*R) / b) * D;
+      C = 180 - A - B;
+    } else if (!isNaN(b) && !isNaN(c) && !isNaN(A)) {
+      a = Math.sqrt(b*b + c*c - 2*b*c*Math.cos(A*R));
+      B = Math.asin(b * Math.sin(A*R) / a) * D;
+      C = 180 - A - B;
+    }
+    // AAS/ASA (two angles + a side)
+    else if (!isNaN(A) && !isNaN(B) && !isNaN(a)) {
+      C = 180 - A - B;
+      b = a * Math.sin(B*R) / Math.sin(A*R);
+      c = a * Math.sin(C*R) / Math.sin(A*R);
+    } else if (!isNaN(A) && !isNaN(B) && !isNaN(b)) {
+      C = 180 - A - B;
+      a = b * Math.sin(A*R) / Math.sin(B*R);
+      c = b * Math.sin(C*R) / Math.sin(B*R);
+    } else if (!isNaN(A) && !isNaN(C) && !isNaN(a)) {
+      B = 180 - A - C;
+      b = a * Math.sin(B*R) / Math.sin(A*R);
+      c = a * Math.sin(C*R) / Math.sin(A*R);
+    }
+
+    if (isNaN(a) || isNaN(b) || isNaN(c) || isNaN(A) || isNaN(B) || isNaN(C)) {
+      alert('Not enough information to solve the triangle.'); return;
+    }
+
+    const area = 0.5 * a * b * Math.sin(C*R);
+    const perim = a + b + c;
+    const fmt = (v: number) => isNaN(v) ? '?' : v.toFixed(4).replace(/\.?0+$/, '');
+
+    document.getElementById('r-a')!.textContent = fmt(a);
+    document.getElementById('r-b')!.textContent = fmt(b);
+    document.getElementById('r-c')!.textContent = fmt(c);
+    document.getElementById('r-A')!.textContent = fmt(A) + '°';
+    document.getElementById('r-B')!.textContent = fmt(B) + '°';
+    document.getElementById('r-C')!.textContent = fmt(C) + '°';
+    document.getElementById('r-area')!.textContent = fmt(area) + ' sq units';
+    document.getElementById('r-perim')!.textContent = fmt(perim);
+
+    const result = document.getElementById('tri-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

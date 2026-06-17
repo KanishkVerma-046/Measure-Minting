@@ -1,0 +1,83 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Percentage Calculator — Solve Any % Problem | MeasureMinting" description="Solve any percentage calculation: what is X% of Y, X is what % of Y, percentage change, and more." path="/calculators/percentage/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Math</div>
+      <h1 class="text-display-lg text-ink">Percentage Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Solve any percentage problem with four modes.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem] space-y-md">
+
+      <!-- Mode 1 -->
+      <div class="calc-card">
+        <p class="text-body-md-strong text-ink mb-md">What is <span class="text-link">X%</span> of Y?</p>
+        <div class="flex items-center gap-sm flex-wrap">
+          <input class="calc-input" id="p1-x" type="number" step="any" placeholder="X" style="width:100px">
+          <span class="text-body-md text-mute">% of</span>
+          <input class="calc-input" id="p1-y" type="number" step="any" placeholder="Y" style="width:120px">
+          <span class="text-body-md text-mute">= </span>
+          <strong id="p1-result" class="text-display-sm text-link min-w-[80px]">?</strong>
+        </div>
+      </div>
+
+      <!-- Mode 2 -->
+      <div class="calc-card">
+        <p class="text-body-md-strong text-ink mb-md">X is <span class="text-link">what %</span> of Y?</p>
+        <div class="flex items-center gap-sm flex-wrap">
+          <input class="calc-input" id="p2-x" type="number" step="any" placeholder="X" style="width:120px">
+          <span class="text-body-md text-mute">is what % of</span>
+          <input class="calc-input" id="p2-y" type="number" step="any" placeholder="Y" style="width:120px">
+          <span class="text-body-md text-mute">= </span>
+          <strong id="p2-result" class="text-display-sm text-link min-w-[80px]">?</strong>
+        </div>
+      </div>
+
+      <!-- Mode 3 -->
+      <div class="calc-card">
+        <p class="text-body-md-strong text-ink mb-md"><span class="text-link">Percentage change</span> from X to Y</p>
+        <div class="flex items-center gap-sm flex-wrap">
+          <span class="text-body-md text-mute">From</span>
+          <input class="calc-input" id="p3-x" type="number" step="any" placeholder="X" style="width:120px">
+          <span class="text-body-md text-mute">to</span>
+          <input class="calc-input" id="p3-y" type="number" step="any" placeholder="Y" style="width:120px">
+          <span class="text-body-md text-mute">= </span>
+          <strong id="p3-result" class="text-display-sm text-link min-w-[80px]">?</strong>
+        </div>
+      </div>
+
+      <!-- Mode 4 -->
+      <div class="calc-card">
+        <p class="text-body-md-strong text-ink mb-md">X% of <span class="text-link">what</span> = Y?</p>
+        <div class="flex items-center gap-sm flex-wrap">
+          <input class="calc-input" id="p4-x" type="number" step="any" placeholder="X%" style="width:100px">
+          <span class="text-body-md text-mute">% of what =</span>
+          <input class="calc-input" id="p4-y" type="number" step="any" placeholder="Y" style="width:120px">
+          <span class="text-body-md text-mute">→ </span>
+          <strong id="p4-result" class="text-display-sm text-link min-w-[80px]">?</strong>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function watchInputs(ids: string[], resultId: string, calc: (...args: number[]) => string) {
+    const inputs = ids.map(id => document.getElementById(id) as HTMLInputElement);
+    const result = document.getElementById(resultId)!;
+    inputs.forEach(inp => inp.addEventListener('input', () => {
+      const vals = inputs.map(i => parseFloat(i.value));
+      if (vals.every(v => !isNaN(v))) result.textContent = calc(...vals);
+      else result.textContent = '?';
+    }));
+  }
+
+  watchInputs(['p1-x','p1-y'], 'p1-result', (x, y) => ((x / 100) * y).toFixed(4).replace(/\.?0+$/, ''));
+  watchInputs(['p2-x','p2-y'], 'p2-result', (x, y) => y !== 0 ? ((x / y) * 100).toFixed(4).replace(/\.?0+$/, '') + '%' : '∞');
+  watchInputs(['p3-x','p3-y'], 'p3-result', (x, y) => x !== 0 ? (((y - x) / Math.abs(x)) * 100).toFixed(2) + '%' : '∞');
+  watchInputs(['p4-x','p4-y'], 'p4-result', (x, y) => x !== 0 ? ((y / x) * 100).toFixed(4).replace(/\.?0+$/, '') : '∞');
+</script>

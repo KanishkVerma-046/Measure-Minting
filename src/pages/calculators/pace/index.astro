@@ -1,0 +1,111 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Pace Calculator — Running Pace, Speed & Time | MeasureMinting" description="Calculate running pace, speed, and finish time. Convert between min/mile, min/km, and mph." path="/calculators/pace/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Health & Fitness</div>
+      <h1 class="text-display-lg text-ink">Pace Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate running pace, speed, or finish time — enter any two values to find the third.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="pace-form">
+          <div class="calc-field">
+            <label class="calc-label" for="dist-val">Distance</label>
+            <div class="flex gap-sm">
+              <input class="calc-input" id="dist-val" type="number" step="0.01" min="0" placeholder="5.0">
+              <select class="calc-select" id="dist-unit" style="flex:0 0 120px">
+                <option value="km">Kilometers</option>
+                <option value="mi">Miles</option>
+                <option value="m">Meters</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">Time (hh : mm : ss) — leave blank to solve</label>
+            <div class="flex gap-xs">
+              <input class="calc-input text-center" id="t-h" type="number" min="0" max="99" placeholder="00" style="flex:1">
+              <span class="flex items-center text-body-lg text-mute">:</span>
+              <input class="calc-input text-center" id="t-m" type="number" min="0" max="59" placeholder="30" style="flex:1">
+              <span class="flex items-center text-body-lg text-mute">:</span>
+              <input class="calc-input text-center" id="t-s" type="number" min="0" max="59" placeholder="00" style="flex:1">
+            </div>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="pace-min">Pace (min per km or mile) — leave blank to solve</label>
+            <div class="flex gap-sm">
+              <input class="calc-input" id="pace-min" type="number" min="0" step="0.01" placeholder="6.00">
+              <select class="calc-select" id="pace-unit" style="flex:0 0 120px">
+                <option value="km">min/km</option>
+                <option value="mi">min/mi</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate</button>
+        </form>
+        <div id="pace-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">Pace (min/km)</span><span id="r-pace-km" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Pace (min/mi)</span><span id="r-pace-mi" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Speed (km/h)</span><span id="r-speed-kph" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Speed (mph)</span><span id="r-speed-mph" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Finish time</span><span id="r-time" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function secsToHMS(s: number) {
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = Math.floor(s % 60);
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+  function fmtPace(minPerUnit: number) {
+    const m = Math.floor(minPerUnit), s = Math.round((minPerUnit - m) * 60);
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  document.getElementById('pace-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const distVal = parseFloat((document.getElementById('dist-val') as HTMLInputElement).value);
+    const distUnit = (document.getElementById('dist-unit') as HTMLSelectElement).value;
+    const paceMin = parseFloat((document.getElementById('pace-min') as HTMLInputElement).value);
+    const paceUnit = (document.getElementById('pace-unit') as HTMLSelectElement).value;
+    const h = parseFloat((document.getElementById('t-h') as HTMLInputElement).value) || 0;
+    const m = parseFloat((document.getElementById('t-m') as HTMLInputElement).value) || 0;
+    const s = parseFloat((document.getElementById('t-s') as HTMLInputElement).value) || 0;
+    const timeSecs = h * 3600 + m * 60 + s;
+
+    if (!distVal) return;
+    let distKm = distUnit === 'km' ? distVal : distUnit === 'mi' ? distVal * 1.60934 : distVal / 1000;
+    let distMi = distKm / 1.60934;
+
+    let totalSecs: number, paceKm: number;
+
+    if (timeSecs > 0 && !paceMin) {
+      totalSecs = timeSecs;
+      paceKm = (timeSecs / 60) / distKm;
+    } else if (paceMin && !(timeSecs > 0)) {
+      const paceKmInput = paceUnit === 'km' ? paceMin : paceMin * 1.60934;
+      paceKm = paceKmInput;
+      totalSecs = paceKm * 60 * distKm;
+    } else return;
+
+    const paceMi = paceKm * 1.60934;
+    const speedKph = 60 / paceKm;
+    const speedMph = 60 / paceMi;
+
+    document.getElementById('r-pace-km')!.textContent = fmtPace(paceKm) + ' min/km';
+    document.getElementById('r-pace-mi')!.textContent = fmtPace(paceMi) + ' min/mi';
+    document.getElementById('r-speed-kph')!.textContent = speedKph.toFixed(2) + ' km/h';
+    document.getElementById('r-speed-mph')!.textContent = speedMph.toFixed(2) + ' mph';
+    document.getElementById('r-time')!.textContent = secsToHMS(totalSecs);
+
+    const result = document.getElementById('pace-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

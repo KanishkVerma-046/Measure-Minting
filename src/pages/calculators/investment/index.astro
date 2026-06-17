@@ -1,0 +1,85 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Investment Calculator — Future Value with Contributions | MeasureMinting" description="Calculate the future value of your investments with regular contributions and compound growth." path="/calculators/investment/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Investment Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Project the future value of your investments with regular contributions.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="inv-form">
+          <div class="calc-field">
+            <label class="calc-label" for="inv-start">Starting Amount ($)</label>
+            <input class="calc-input" id="inv-start" type="number" min="0" step="1000" placeholder="10000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="inv-contrib">Regular Contribution ($)</label>
+            <input class="calc-input" id="inv-contrib" type="number" min="0" step="100" placeholder="500">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="inv-freq">Contribution Frequency</label>
+            <select class="calc-select" id="inv-freq">
+              <option value="12">Monthly</option>
+              <option value="26">Bi-weekly</option>
+              <option value="52">Weekly</option>
+              <option value="4">Quarterly</option>
+              <option value="1">Annually</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="inv-rate">Expected Annual Return (%)</label>
+            <input class="calc-input" id="inv-rate" type="number" step="0.1" min="0" placeholder="8.0">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="inv-years">Investment Period (years)</label>
+            <input class="calc-input" id="inv-years" type="number" min="1" max="100" placeholder="25">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Investment</button>
+        </form>
+        <div id="inv-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Future Value</div>
+            <div id="inv-fv" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Starting amount</span><span id="inv-r-start" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total contributions</span><span id="inv-r-contrib" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Interest earned</span><span id="inv-r-gain" class="calc-result-value" style="color:var(--color-success)"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('inv-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const P = parseFloat((document.getElementById('inv-start') as HTMLInputElement).value) || 0;
+    const contrib = parseFloat((document.getElementById('inv-contrib') as HTMLInputElement).value) || 0;
+    const freq = parseInt((document.getElementById('inv-freq') as HTMLSelectElement).value);
+    const rate = parseFloat((document.getElementById('inv-rate') as HTMLInputElement).value);
+    const years = parseInt((document.getElementById('inv-years') as HTMLInputElement).value);
+
+    if (!rate || !years) return;
+
+    const r = rate / 100 / freq;
+    const n = freq * years;
+    const fv = P * Math.pow(1 + r, n) + (r > 0 ? contrib * (Math.pow(1 + r, n) - 1) / r : contrib * n);
+    const totalContrib = contrib * n;
+    const gain = fv - P - totalContrib;
+
+    const fmt = (v: number) => '$' + Math.round(v).toLocaleString('en-US');
+    document.getElementById('inv-fv')!.textContent = fmt(fv);
+    document.getElementById('inv-r-start')!.textContent = fmt(P);
+    document.getElementById('inv-r-contrib')!.textContent = fmt(totalContrib);
+    document.getElementById('inv-r-gain')!.textContent = fmt(gain);
+
+    const result = document.getElementById('inv-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

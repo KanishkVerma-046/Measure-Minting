@@ -1,0 +1,91 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Ideal Weight Calculator | MeasureMinting" description="Calculate your ideal body weight using four popular formulas: Devine, Robinson, Miller, and Hamwi." path="/calculators/ideal-weight/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Health & Fitness</div>
+      <h1 class="text-display-lg text-ink">Ideal Weight Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Find your ideal body weight using four research-based formulas.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="iw-form">
+          <div class="mb-md flex gap-sm">
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="system" value="metric" checked class="accent-link"> Metric</label>
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="system" value="imperial" class="accent-link"> Imperial</label>
+          </div>
+          <div class="mb-md flex gap-sm">
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sex" value="male" checked class="accent-link"> Male</label>
+            <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="sex" value="female" class="accent-link"> Female</label>
+          </div>
+          <div id="metric-h">
+            <div class="calc-field"><label class="calc-label" for="height-cm">Height (cm)</label><input class="calc-input" id="height-cm" type="number" step="0.1" placeholder="175"></div>
+          </div>
+          <div id="imperial-h" class="hidden">
+            <div class="flex gap-sm">
+              <div class="calc-field flex-1"><label class="calc-label" for="height-ft">Height (ft)</label><input class="calc-input" id="height-ft" type="number" placeholder="5"></div>
+              <div class="calc-field flex-1"><label class="calc-label" for="height-in">Height (in)</label><input class="calc-input" id="height-in" type="number" step="0.1" placeholder="9"></div>
+            </div>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Ideal Weight</button>
+        </form>
+        <div id="iw-result" class="calc-result hidden">
+          <div class="calc-result-row"><span class="calc-result-label">Devine formula</span><span id="devine" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Robinson formula</span><span id="robinson" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Miller formula</span><span id="miller" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Hamwi formula</span><span id="hamwi" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label font-medium">Average</span><span id="average" class="calc-result-value font-semibold text-link"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('input[name="system"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      const isMetric = (e.target as HTMLInputElement).value === 'metric';
+      document.getElementById('metric-h')!.classList.toggle('hidden', !isMetric);
+      document.getElementById('imperial-h')!.classList.toggle('hidden', isMetric);
+    });
+  });
+
+  document.getElementById('iw-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const isMetric = (document.querySelector('input[name="system"]:checked') as HTMLInputElement).value === 'metric';
+    const isMale = (document.querySelector('input[name="sex"]:checked') as HTMLInputElement).value === 'male';
+
+    let heightCm: number;
+    if (isMetric) {
+      heightCm = parseFloat((document.getElementById('height-cm') as HTMLInputElement).value);
+    } else {
+      const ft = parseFloat((document.getElementById('height-ft') as HTMLInputElement).value) || 0;
+      const inch = parseFloat((document.getElementById('height-in') as HTMLInputElement).value) || 0;
+      heightCm = (ft * 12 + inch) * 2.54;
+    }
+    if (!heightCm) return;
+
+    const heightIn = heightCm / 2.54;
+    const inchesOver5ft = Math.max(0, heightIn - 60);
+
+    const devine = isMale ? 50 + 2.3 * inchesOver5ft : 45.5 + 2.3 * inchesOver5ft;
+    const robinson = isMale ? 52 + 1.9 * inchesOver5ft : 49 + 1.7 * inchesOver5ft;
+    const miller = isMale ? 56.2 + 1.41 * inchesOver5ft : 53.1 + 1.36 * inchesOver5ft;
+    const hamwi = isMale ? 48 + 2.7 * inchesOver5ft : 45.5 + 2.2 * inchesOver5ft;
+    const avg = (devine + robinson + miller + hamwi) / 4;
+
+    const fmt = (kg: number) => isMetric ? `${kg.toFixed(1)} kg` : `${(kg * 2.20462).toFixed(1)} lbs`;
+    document.getElementById('devine')!.textContent = fmt(devine);
+    document.getElementById('robinson')!.textContent = fmt(robinson);
+    document.getElementById('miller')!.textContent = fmt(miller);
+    document.getElementById('hamwi')!.textContent = fmt(hamwi);
+    document.getElementById('average')!.textContent = fmt(avg);
+
+    const result = document.getElementById('iw-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

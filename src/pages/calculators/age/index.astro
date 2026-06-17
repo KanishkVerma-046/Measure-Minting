@@ -1,0 +1,87 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Age Calculator — Exact Age in Years, Months & Days | MeasureMinting" description="Calculate your exact age in years, months, days, hours, minutes, and seconds from your birthdate." path="/calculators/age/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Other</div>
+      <h1 class="text-display-lg text-ink">Age Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Find your exact age in years, months, days, hours, minutes, and seconds.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="age-form">
+          <div class="calc-field">
+            <label class="calc-label" for="birthdate">Date of Birth</label>
+            <input class="calc-input" id="birthdate" type="date">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="age-at-date">Age at Date (default: today)</label>
+            <input class="calc-input" id="age-at-date" type="date">
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Age</button>
+        </form>
+        <div id="age-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Age</div>
+            <div id="age-main" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Total months</span><span id="age-months" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total weeks</span><span id="age-weeks" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total days</span><span id="age-days" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total hours</span><span id="age-hours" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Next birthday</span><span id="age-next-bday" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('age-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const bdVal = (document.getElementById('birthdate') as HTMLInputElement).value;
+    if (!bdVal) return;
+    const atVal = (document.getElementById('age-at-date') as HTMLInputElement).value;
+
+    const birth = new Date(bdVal);
+    const at = atVal ? new Date(atVal) : new Date();
+    at.setHours(0, 0, 0, 0);
+
+    if (birth > at) return;
+
+    let years = at.getFullYear() - birth.getFullYear();
+    let months = at.getMonth() - birth.getMonth();
+    let days = at.getDate() - birth.getDate();
+
+    if (days < 0) {
+      months--;
+      const prevMonth = new Date(at.getFullYear(), at.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months < 0) { years--; months += 12; }
+
+    const totalDays = Math.floor((at.getTime() - birth.getTime()) / 86400000);
+    const totalMonths = years * 12 + months;
+    const totalWeeks = Math.floor(totalDays / 7);
+    const totalHours = totalDays * 24;
+
+    // Next birthday
+    const nextBday = new Date(at.getFullYear(), birth.getMonth(), birth.getDate());
+    if (nextBday <= at) nextBday.setFullYear(at.getFullYear() + 1);
+    const daysToNext = Math.ceil((nextBday.getTime() - at.getTime()) / 86400000);
+
+    document.getElementById('age-main')!.textContent = `${years} years, ${months} months, ${days} days`;
+    document.getElementById('age-months')!.textContent = totalMonths.toLocaleString();
+    document.getElementById('age-weeks')!.textContent = totalWeeks.toLocaleString();
+    document.getElementById('age-days')!.textContent = totalDays.toLocaleString();
+    document.getElementById('age-hours')!.textContent = totalHours.toLocaleString();
+    document.getElementById('age-next-bday')!.textContent = `${nextBday.toLocaleDateString('en-US', { month:'long', day:'numeric' })} (in ${daysToNext} days)`;
+
+    const result = document.getElementById('age-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

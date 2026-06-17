@@ -1,0 +1,93 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Auto Loan Calculator — Car Payment Calculator | MeasureMinting" description="Calculate your monthly car payment including down payment, trade-in value, and sales tax." path="/calculators/auto-loan/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Financial</div>
+      <h1 class="text-display-lg text-ink">Auto Loan Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate your monthly car payment with down payment, trade-in, and sales tax.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <form id="auto-form">
+          <div class="calc-field">
+            <label class="calc-label" for="car-price">Vehicle Price ($)</label>
+            <input class="calc-input" id="car-price" type="number" min="0" step="500" placeholder="35000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="auto-down">Down Payment ($)</label>
+            <input class="calc-input" id="auto-down" type="number" min="0" step="500" placeholder="5000">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="trade-in">Trade-in Value ($)</label>
+            <input class="calc-input" id="trade-in" type="number" min="0" step="500" placeholder="0">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="sales-tax-rate">Sales Tax Rate (%)</label>
+            <input class="calc-input" id="sales-tax-rate" type="number" min="0" max="20" step="0.1" placeholder="7.0">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="auto-rate">Annual Interest Rate (%)</label>
+            <input class="calc-input" id="auto-rate" type="number" step="0.01" min="0" placeholder="6.5">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label" for="auto-term">Loan Term</label>
+            <select class="calc-select" id="auto-term">
+              <option value="72">72 months (6 years)</option>
+              <option value="60" selected>60 months (5 years)</option>
+              <option value="48">48 months (4 years)</option>
+              <option value="36">36 months (3 years)</option>
+              <option value="24">24 months (2 years)</option>
+            </select>
+          </div>
+          <button type="submit" class="calc-btn btn-gradient text-white">Calculate Car Payment</button>
+        </form>
+        <div id="auto-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Monthly Payment</div>
+            <div id="auto-monthly" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Loan amount (financed)</span><span id="auto-financed" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Sales tax</span><span id="auto-tax" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total of payments</span><span id="auto-total" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total interest paid</span><span id="auto-interest" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('auto-form')!.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const price = parseFloat((document.getElementById('car-price') as HTMLInputElement).value) || 0;
+    const down = parseFloat((document.getElementById('auto-down') as HTMLInputElement).value) || 0;
+    const tradeIn = parseFloat((document.getElementById('trade-in') as HTMLInputElement).value) || 0;
+    const taxRate = parseFloat((document.getElementById('sales-tax-rate') as HTMLInputElement).value) || 0;
+    const rate = parseFloat((document.getElementById('auto-rate') as HTMLInputElement).value);
+    const n = parseInt((document.getElementById('auto-term') as HTMLSelectElement).value);
+
+    if (!price || !n) return;
+
+    const tax = price * (taxRate / 100);
+    const financed = price + tax - down - tradeIn;
+    const r = rate / 100 / 12;
+    const payment = r === 0 ? financed / n : financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const total = payment * n;
+    const interest = total - financed;
+
+    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('auto-monthly')!.textContent = fmt(payment);
+    document.getElementById('auto-financed')!.textContent = fmt(financed);
+    document.getElementById('auto-tax')!.textContent = fmt(tax);
+    document.getElementById('auto-total')!.textContent = fmt(total);
+    document.getElementById('auto-interest')!.textContent = fmt(interest);
+
+    const result = document.getElementById('auto-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>

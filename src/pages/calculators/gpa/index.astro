@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="GPA Calculator — Semester & Cumulative GPA | MeasureMinting" description="Calculate your semester GPA and cumulative GPA from course grades and credit hours." path="/calculators/gpa/">
+  <div class="calc-hero px-md py-2xl sm:py-3xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px] text-center">
+      <div class="mx-auto mb-md inline-flex items-center rounded-full bg-link-bg-soft px-sm py-xxs text-caption font-medium text-link">Other</div>
+      <h1 class="text-display-lg text-ink">GPA Calculator</h1>
+      <p class="mx-auto mt-sm max-w-[56ch] text-body-lg text-body">Calculate your semester and cumulative GPA from course grades and credit hours.</p>
+    </div>
+  </div>
+  <section class="px-md py-2xl sm:px-lg pb-section">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="calc-card">
+        <div class="overflow-x-auto mb-md">
+          <table class="w-full text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline">
+                <th class="text-left py-xs pr-sm font-medium text-ink">Course</th>
+                <th class="text-left py-xs px-xs font-medium text-ink">Grade</th>
+                <th class="text-left py-xs px-xs font-medium text-ink">Credits</th>
+              </tr>
+            </thead>
+            <tbody id="gpa-tbody"></tbody>
+          </table>
+        </div>
+        <button id="add-course" type="button" class="inline-flex items-center gap-xs rounded-xl border border-hairline bg-canvas px-md py-xs text-body-sm-strong hover:bg-link-bg-soft hover:border-link hover:text-link transition-colors mb-lg">
+          + Add course
+        </button>
+        <div class="border-t border-hairline pt-md">
+          <p class="text-body-sm-strong text-ink mb-sm">Previous GPA (optional)</p>
+          <div class="flex gap-sm">
+            <div class="calc-field flex-1"><label class="calc-label" for="prev-gpa">Current GPA</label><input class="calc-input" id="prev-gpa" type="number" step="0.01" min="0" max="4.0" placeholder="3.50"></div>
+            <div class="calc-field flex-1"><label class="calc-label" for="prev-credits">Credits Earned</label><input class="calc-input" id="prev-credits" type="number" step="0.5" min="0" placeholder="60"></div>
+          </div>
+        </div>
+        <button id="calc-gpa" type="button" class="calc-btn btn-gradient text-white">Calculate GPA</button>
+
+        <div id="gpa-result" class="calc-result hidden">
+          <div class="text-center mb-md">
+            <div class="text-caption text-mute mb-xxs">Semester GPA</div>
+            <div id="sem-gpa" class="calc-result-primary"></div>
+          </div>
+          <div class="calc-result-row"><span class="calc-result-label">Cumulative GPA</span><span id="cum-gpa" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Semester credits</span><span id="sem-credits" class="calc-result-value"></span></div>
+          <div class="calc-result-row"><span class="calc-result-label">Total credits</span><span id="total-credits" class="calc-result-value"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const gradePoints: Record<string, number> = {
+    'A+':4.0,'A':4.0,'A-':3.7,'B+':3.3,'B':3.0,'B-':2.7,
+    'C+':2.3,'C':2.0,'C-':1.7,'D+':1.3,'D':1.0,'D-':0.7,'F':0.0
+  };
+
+  function addRow(num: number) {
+    const tr = document.createElement('tr');
+    tr.className = 'gpa-row border-b border-hairline';
+    tr.innerHTML = `
+      <td class="py-xs pr-sm"><input type="text" class="calc-input course-name" placeholder="Course ${num}" style="padding:6px 10px"></td>
+      <td class="py-xs px-xs">
+        <select class="calc-select grade-sel" style="padding:6px 10px">
+          ${Object.keys(gradePoints).map(g => `<option value="${g}">${g}</option>`).join('')}
+        </select>
+      </td>
+      <td class="py-xs px-xs"><input type="number" class="calc-input credit-hrs" step="0.5" min="0" max="6" placeholder="3" style="padding:6px 10px;width:70px"></td>
+    `;
+    document.getElementById('gpa-tbody')!.appendChild(tr);
+  }
+
+  let count = 0;
+  for (let i = 0; i < 5; i++) addRow(++count);
+
+  document.getElementById('add-course')!.addEventListener('click', () => addRow(++count));
+
+  document.getElementById('calc-gpa')!.addEventListener('click', () => {
+    let totalPoints = 0, totalCredits = 0;
+    document.querySelectorAll('.gpa-row').forEach(row => {
+      const grade = (row.querySelector('.grade-sel') as HTMLSelectElement).value;
+      const credits = parseFloat((row.querySelector('.credit-hrs') as HTMLInputElement).value) || 0;
+      if (credits > 0 && gradePoints[grade] !== undefined) {
+        totalPoints += gradePoints[grade] * credits;
+        totalCredits += credits;
+      }
+    });
+
+    if (totalCredits === 0) return;
+    const semGpa = totalPoints / totalCredits;
+
+    const prevGpa = parseFloat((document.getElementById('prev-gpa') as HTMLInputElement).value) || NaN;
+    const prevCredits = parseFloat((document.getElementById('prev-credits') as HTMLInputElement).value) || 0;
+
+    let cumGpa = semGpa;
+    let totalC = totalCredits;
+    if (!isNaN(prevGpa) && prevCredits > 0) {
+      cumGpa = (prevGpa * prevCredits + totalPoints) / (prevCredits + totalCredits);
+      totalC = prevCredits + totalCredits;
+    }
+
+    document.getElementById('sem-gpa')!.textContent = semGpa.toFixed(2);
+    document.getElementById('cum-gpa')!.textContent = cumGpa.toFixed(2);
+    document.getElementById('sem-credits')!.textContent = totalCredits.toFixed(1);
+    document.getElementById('total-credits')!.textContent = totalC.toFixed(1);
+
+    const result = document.getElementById('gpa-result')!;
+    result.classList.remove('hidden');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+</script>
