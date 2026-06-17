@@ -14,6 +14,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="calc-card">
         <form id="tax-form">
           <div class="calc-field">
+            <label class="calc-label" for="tax-currency">Currency</label>
+            <select class="calc-select" id="tax-currency">
+              <option value="USD">USD – US Dollar ($)</option>
+              <option value="EUR">EUR – Euro (€)</option>
+              <option value="GBP">GBP – British Pound (£)</option>
+              <option value="CAD">CAD – Canadian Dollar (C$)</option>
+              <option value="AUD">AUD – Australian Dollar (A$)</option>
+              <option value="CHF">CHF – Swiss Franc (Fr.)</option>
+              <option value="JPY">JPY – Japanese Yen (¥)</option>
+              <option value="CNY">CNY – Chinese Yuan (¥)</option>
+              <option value="INR">INR – Indian Rupee (₹)</option>
+              <option value="BRL">BRL – Brazilian Real (R$)</option>
+              <option value="MXN">MXN – Mexican Peso (MX$)</option>
+              <option value="KRW">KRW – South Korean Won (₩)</option>
+              <option value="SGD">SGD – Singapore Dollar (S$)</option>
+              <option value="HKD">HKD – Hong Kong Dollar (HK$)</option>
+            </select>
+          </div>
+          <div class="calc-field">
             <label class="calc-label" for="gross-income">Annual Gross Income ($)</label>
             <input class="calc-input" id="gross-income" type="number" min="0" step="1000" placeholder="75000">
           </div>
@@ -51,6 +70,20 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
+  const CURR_SYMBOLS: Record<string, string> = {
+    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'Fr.',
+    JPY: '¥', CNY: '¥', INR: '₹', BRL: 'R$', MXN: 'MX$', KRW: '₩',
+    SGD: 'S$', HKD: 'HK$'
+  };
+  const origLabels = new Map<Element, string>();
+  document.querySelectorAll('.calc-label').forEach(el => {
+    if (el.textContent?.includes('$')) origLabels.set(el, el.textContent!);
+  });
+  document.getElementById('tax-currency')!.addEventListener('change', () => {
+    const sym = CURR_SYMBOLS[(document.getElementById('tax-currency') as HTMLSelectElement).value] ?? '$';
+    origLabels.forEach((orig, el) => { el.textContent = orig.replace(/\$/g, sym); });
+  });
+
   // 2024 US federal tax brackets
   const brackets: Record<string, [number, number][]> = {
     'single': [[0,0.10],[11600,0.12],[47150,0.22],[100525,0.24],[191950,0.32],[243725,0.35],[609350,0.37]],
@@ -78,6 +111,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
   document.getElementById('tax-form')!.addEventListener('submit', (e) => {
     e.preventDefault();
+    const currCode = (document.getElementById('tax-currency') as HTMLSelectElement).value;
+    const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currCode, maximumFractionDigits: 0 }).format(v);
     const gross = parseFloat((document.getElementById('gross-income') as HTMLInputElement).value);
     const status = (document.getElementById('filing-status') as HTMLSelectElement).value;
     const extraDed = parseFloat((document.getElementById('deductions') as HTMLInputElement).value) || 0;
@@ -88,7 +123,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const taxable = Math.max(0, gross - stdDed - extraDed);
     const [tax, marginal] = calcTax(taxable, status);
 
-    const fmt = (v: number) => '$' + Math.round(v).toLocaleString('en-US');
     document.getElementById('tax-amount')!.textContent = fmt(tax);
     document.getElementById('tax-gross')!.textContent = fmt(gross);
     document.getElementById('tax-std-ded')!.textContent = fmt(stdDed);

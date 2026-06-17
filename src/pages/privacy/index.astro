@@ -1,0 +1,95 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+const path = "/privacy/";
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: "Privacy Policy", path },
+];
+
+const lastUpdated = "June 17, 2026";
+---
+
+<BaseLayout
+  title="Privacy Policy — MeasureMinting"
+  description="MeasureMinting's privacy policy explains what data we collect, how we use it, and how we protect your information."
+  path={path}
+>
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h1 class="text-display-xl text-ink text-balance">Privacy Policy</h1>
+      <p class="mt-xs text-body-sm text-mute">Last updated: {lastUpdated}</p>
+
+      <div class="prose-seo mt-2xl space-y-2xl text-body-md text-body">
+
+        <div>
+          <h2 class="text-display-md text-ink">Overview</h2>
+          <p class="mt-sm">
+            MeasureMinting is a browser-based tool. All unit conversions and calculations happen entirely on your device — no data is sent to our servers. We are committed to keeping your experience private and free from unnecessary data collection.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Information We Collect</h2>
+          <p class="mt-sm">
+            We do not collect any personally identifiable information. We do not require account registration, and no user data is stored on our servers.
+          </p>
+          <p class="mt-sm">
+            We may collect anonymous, aggregated usage data through analytics tools (such as page views and referrer information) solely to understand how the site is being used and to improve it. This data cannot be used to identify any individual.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Cookies & Local Storage</h2>
+          <p class="mt-sm">
+            MeasureMinting uses your browser's <code class="rounded bg-canvas-soft px-xs py-xxs text-caption-mono text-ink">localStorage</code> to remember your theme preference (light or dark mode). This data never leaves your device and is not accessible to us.
+          </p>
+          <p class="mt-sm">
+            We do not use tracking cookies, advertising cookies, or any third-party cookies for profiling purposes.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Third-Party Services</h2>
+          <p class="mt-sm">
+            We may use third-party analytics services (e.g. Google Analytics or a privacy-first alternative). If we do, those services process only anonymised data and are bound by their own privacy policies. We do not sell, rent, or share your data with any third party for commercial purposes.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Children's Privacy</h2>
+          <p class="mt-sm">
+            MeasureMinting is not directed at children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us and we will delete it promptly.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Links to Other Sites</h2>
+          <p class="mt-sm">
+            Our site may contain links to third-party websites. We are not responsible for the privacy practices or content of those sites. We encourage you to review the privacy policy of any site you visit.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Changes to This Policy</h2>
+          <p class="mt-sm">
+            We may update this Privacy Policy from time to time. Changes will be reflected by updating the "Last updated" date at the top of this page. Continued use of MeasureMinting after any changes constitutes acceptance of the updated policy.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Contact</h2>
+          <p class="mt-sm">
+            If you have any questions about this Privacy Policy, please reach out at <a href="/contact/" class="text-link hover:underline">our contact page</a>.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</BaseLayout>

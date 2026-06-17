@@ -1,0 +1,110 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+
+const path = "/terms/";
+const breadcrumbItems = [
+  { label: "Home", path: "/" },
+  { label: "Terms & Conditions", path },
+];
+
+const lastUpdated = "June 17, 2026";
+---
+
+<BaseLayout
+  title="Terms & Conditions — MeasureMinting"
+  description="Read MeasureMinting's terms and conditions for using our free online unit converter and calculator tools."
+  path={path}
+>
+  <section class="px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[42rem]">
+      <div class="mb-lg">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      <h1 class="text-display-xl text-ink text-balance">Terms & Conditions</h1>
+      <p class="mt-xs text-body-sm text-mute">Last updated: {lastUpdated}</p>
+
+      <div class="prose-seo mt-2xl space-y-2xl text-body-md text-body">
+
+        <div>
+          <h2 class="text-display-md text-ink">Acceptance of Terms</h2>
+          <p class="mt-sm">
+            By accessing or using MeasureMinting ("the Site"), you agree to be bound by these Terms & Conditions. If you do not agree with any part of these terms, please discontinue use of the Site immediately.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Use of the Site</h2>
+          <p class="mt-sm">MeasureMinting is provided for informational and educational purposes only. You may use the Site freely for personal, academic, or professional reference. You agree not to:</p>
+          <ul class="ml-lg mt-sm list-disc space-y-xs">
+            <li>Use the Site for any unlawful purpose.</li>
+            <li>Attempt to disrupt, interfere with, or gain unauthorised access to any part of the Site or its infrastructure.</li>
+            <li>Scrape, crawl, or systematically extract data from the Site in a manner that places excessive load on our servers without prior written permission.</li>
+            <li>Reproduce or redistribute Site content commercially without permission.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Accuracy Disclaimer</h2>
+          <p class="mt-sm">
+            All conversion factors and calculator results on MeasureMinting are based on internationally recognised standards (SI units, US customary units, and imperial units). However, we make no warranty — express or implied — regarding the accuracy, completeness, or suitability of any result for a specific purpose.
+          </p>
+          <p class="mt-sm">
+            Results are provided "as-is" for general reference only. For safety-critical applications — including medical dosing, structural engineering, or legal compliance — always verify results with authoritative sources or qualified professionals.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Intellectual Property</h2>
+          <p class="mt-sm">
+            All content on MeasureMinting — including but not limited to text, design, graphics, code, and layout — is the property of MeasureMinting and is protected by applicable intellectual property laws. You may not reproduce, modify, or distribute any part of the Site without express written permission, except as permitted by fair use.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Limitation of Liability</h2>
+          <p class="mt-sm">
+            To the fullest extent permitted by law, MeasureMinting and its operators shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of — or inability to use — the Site or any results obtained from it. Your use of the Site is entirely at your own risk.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Third-Party Links</h2>
+          <p class="mt-sm">
+            The Site may contain links to third-party websites. These links are provided for convenience only. MeasureMinting has no control over, and accepts no responsibility for, the content, privacy practices, or terms of any third-party site.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Modifications to the Site</h2>
+          <p class="mt-sm">
+            We reserve the right to modify, suspend, or discontinue any part of the Site at any time without notice. We shall not be liable to you or any third party for any such modification, suspension, or discontinuation.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Changes to These Terms</h2>
+          <p class="mt-sm">
+            We may revise these Terms & Conditions at any time. The "Last updated" date at the top of this page will reflect any changes. Your continued use of the Site after changes are posted constitutes acceptance of the revised terms.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Governing Law</h2>
+          <p class="mt-sm">
+            These Terms & Conditions are governed by and construed in accordance with applicable law. Any disputes arising under these terms shall be subject to the exclusive jurisdiction of the competent courts.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Contact</h2>
+          <p class="mt-sm">
+            Questions about these Terms & Conditions? Visit our <a href="/contact/" class="text-link hover:underline">contact page</a>.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</BaseLayout>

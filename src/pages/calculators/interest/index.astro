@@ -14,6 +14,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="calc-card">
         <form id="si-form">
           <div class="calc-field">
+            <label class="calc-label" for="si-currency">Currency</label>
+            <select class="calc-select" id="si-currency">
+              <option value="USD">USD – US Dollar ($)</option>
+              <option value="EUR">EUR – Euro (€)</option>
+              <option value="GBP">GBP – British Pound (£)</option>
+              <option value="CAD">CAD – Canadian Dollar (C$)</option>
+              <option value="AUD">AUD – Australian Dollar (A$)</option>
+              <option value="CHF">CHF – Swiss Franc (Fr.)</option>
+              <option value="JPY">JPY – Japanese Yen (¥)</option>
+              <option value="CNY">CNY – Chinese Yuan (¥)</option>
+              <option value="INR">INR – Indian Rupee (₹)</option>
+              <option value="BRL">BRL – Brazilian Real (R$)</option>
+              <option value="MXN">MXN – Mexican Peso (MX$)</option>
+              <option value="KRW">KRW – South Korean Won (₩)</option>
+              <option value="SGD">SGD – Singapore Dollar (S$)</option>
+              <option value="HKD">HKD – Hong Kong Dollar (HK$)</option>
+            </select>
+          </div>
+          <div class="calc-field">
             <label class="calc-label" for="si-principal">Principal Amount ($)</label>
             <input class="calc-input" id="si-principal" type="number" min="0" step="100" placeholder="10000">
           </div>
@@ -43,8 +62,24 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
+  const CURR_SYMBOLS: Record<string, string> = {
+    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'Fr.',
+    JPY: '¥', CNY: '¥', INR: '₹', BRL: 'R$', MXN: 'MX$', KRW: '₩',
+    SGD: 'S$', HKD: 'HK$'
+  };
+  const origLabels = new Map<Element, string>();
+  document.querySelectorAll('.calc-label').forEach(el => {
+    if (el.textContent?.includes('$')) origLabels.set(el, el.textContent!);
+  });
+  document.getElementById('si-currency')!.addEventListener('change', () => {
+    const sym = CURR_SYMBOLS[(document.getElementById('si-currency') as HTMLSelectElement).value] ?? '$';
+    origLabels.forEach((orig, el) => { el.textContent = orig.replace(/\$/g, sym); });
+  });
+
   document.getElementById('si-form')!.addEventListener('submit', (e) => {
     e.preventDefault();
+    const currCode = (document.getElementById('si-currency') as HTMLSelectElement).value;
+    const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currCode }).format(v);
     const P = parseFloat((document.getElementById('si-principal') as HTMLInputElement).value);
     const r = parseFloat((document.getElementById('si-rate') as HTMLInputElement).value) / 100;
     const t = parseFloat((document.getElementById('si-years') as HTMLInputElement).value);
@@ -52,7 +87,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     if (!P || isNaN(r) || !t) return;
 
     const I = P * r * t;
-    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     document.getElementById('si-interest')!.textContent = fmt(I);
     document.getElementById('si-r-principal')!.textContent = fmt(P);
     document.getElementById('si-r-total')!.textContent = fmt(P + I);

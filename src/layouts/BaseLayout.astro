@@ -8,9 +8,12 @@ interface Props {
   title: string;
   description: string;
   path: string;
+  keywords?: string;
+  ogImage?: string;
+  ogType?: "website" | "article";
 }
 
-const { title, description, path } = Astro.props;
+const { title, description, path, keywords, ogImage, ogType } = Astro.props;
 ---
 
 <!doctype html>
@@ -38,7 +41,7 @@ const { title, description, path } = Astro.props;
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/Geist-Variable.woff2" crossorigin="anonymous" />
     <meta name="generator" content={Astro.generator} />
-    <Seo title={title} description={description} path={path} />
+    <Seo title={title} description={description} path={path} keywords={keywords} ogImage={ogImage} ogType={ogType} />
     <slot name="head" />
   </head>
   <body class="flex min-h-screen flex-col bg-canvas-soft text-ink">

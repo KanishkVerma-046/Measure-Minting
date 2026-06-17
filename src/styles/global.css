@@ -371,4 +371,27 @@
     color: var(--color-link);
     letter-spacing: -0.5px;
   }
+
+  /* SEO article prose */
+  .prose-seo p {
+    line-height: 1.75;
+    color: var(--color-body);
+  }
+  .prose-seo h3 {
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-xs);
+  }
+  .prose-seo ul {
+    list-style: disc;
+    padding-left: var(--spacing-xl);
+    line-height: 1.8;
+    color: var(--color-body);
+  }
+  .prose-seo strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .prose-seo em {
+    font-style: italic;
+  }
 }

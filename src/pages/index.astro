@@ -5,8 +5,10 @@ import Card from "../components/Card.astro";
 import Button from "../components/Button.astro";
 import Badge from "../components/Badge.astro";
 import UnitConverter from "../components/UnitConverter.astro";
+import JsonLd from "../components/JsonLd.astro";
 import { CATEGORIES } from "../lib/units";
 import { categoryPath, pairToLinkItem } from "../lib/paths";
+import { SITE_URL, SITE_NAME } from "../lib/seo";
 
 const featuredPairs = [
   { categoryId: "length", from: "meters", to: "feet" },
@@ -43,13 +45,138 @@ const featuredCalcs = [
   { label: "Percentage Calculator", href: "/calculators/percentage/", category: "Math", description: "Solve any percentage problem" },
   { label: "Calorie Calculator", href: "/calculators/calorie/", category: "Health", description: "Daily calorie needs (TDEE)" },
 ];
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: "Free online unit converter and calculator suite for length, weight, temperature, volume, area, speed, and more. Plus 38+ calculators for finance, health, math, and everyday use.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/all-converters/`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}/favicon-96x96.png`,
+  sameAs: [],
+};
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What are the rules for unit converter?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "A unit converter follows one rule: every conversion uses a fixed mathematical relationship between units. Enter a value in one unit and the tool multiplies or divides it by the appropriate conversion factor to produce the equivalent in the target unit. Always ensure the units belong to the same measurement category — you cannot convert metres to kilograms because they measure different physical quantities.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How to use a unit converter?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Select the measurement category you need (such as Length or Temperature), then choose your From and To units from the dropdown menus. Type your value into either input field and the converted result appears instantly — no button press required. You can also type in the second field to reverse the conversion.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Why is unit conversion important?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Unit conversion is essential in science, engineering, cooking, travel, and everyday life. Different countries and industries use different measurement systems — the metric and imperial systems being the most common. Accurate conversion prevents costly errors in manufacturing, ensures medical dosages are correct, and helps people understand distances and temperatures expressed in unfamiliar units.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What are common types of conversions?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The most frequently performed conversions include length (metres to feet, kilometres to miles), weight and mass (kilograms to pounds), temperature (Celsius to Fahrenheit), volume (litres to gallons), area (square metres to square feet), speed (km/h to mph), time (hours to seconds), pressure (psi to bar), power (watts to horsepower), and electricity units (volts, amperes, kilowatt-hours).",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What are some common mistakes in unit conversions?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The most common mistakes are converting between incompatible unit types (confusing mass with weight, for example), using outdated or imprecise conversion factors, forgetting that temperature conversions use formulas rather than simple multiplication, and rounding intermediate results before completing the full calculation. Always verify the unit category and use a reliable, up-to-date tool.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is a unit converter?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "A unit converter is an online tool that automatically translates a numerical value from one unit of measurement to another. It eliminates the need to memorise conversion formulas or perform manual arithmetic. MeasureMinting's unit converter covers length, weight, temperature, volume, area, speed, time, pressure, power, electricity, and more — all updating in real time as you type.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How accurate are the conversions?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "All conversions on MeasureMinting use industry-standard conversion factors sourced from SI (International System of Units) definitions and widely accepted scientific references. Results are calculated with full floating-point precision and displayed to a practical number of significant figures. For everyday and professional use, the results match any scientific or engineering reference.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is this conversion tool free to use?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, MeasureMinting is completely free. There are no subscriptions, no account required, and no limits on how many conversions you can perform. Every tool on the site — unit converters and calculators alike — runs directly in your browser at no cost.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What unit categories are supported?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "MeasureMinting supports conversions across length, weight and mass, temperature, volume, area, speed, time, pressure, power, electricity, and more. Visit the All Converters page for the full list of supported categories and units.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do I need to install anything to use this site?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No installation is required. MeasureMinting runs entirely in your web browser. Simply open the site on any device — desktop, tablet, or smartphone — and start converting immediately. No app download, no plug-in, and no account creation is needed.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Why do my results look different from another conversion site?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Small differences can occur due to rounding rules, the number of decimal places displayed, or slightly different conversion factors used by different tools. MeasureMinting uses precise, SI-standard conversion factors. If you see a significant discrepancy, the other tool may be using an outdated or rounded factor.",
+      },
+    },
+  ],
+};
 ---
 
 <BaseLayout
-  title="MeasureMinting — Free Online Unit Converter & Calculators"
-  description="Convert length, weight, temperature, volume, area, and speed instantly. Plus 38+ free calculators for finance, health, math, and more."
+  title="Unit Converter — Free Online Unit Converter Calculator | MeasureMinting"
+  description="Use MeasureMinting's free online unit converter to convert length, weight, temperature, volume, area, speed, pressure, power, and more. Plus 38+ calculators for finance, health, and math."
   path="/"
+  keywords="unit converter, online unit converter, unit converter calculator, unit converter app, weight unit converter, time unit converter, pressure unit converter, compound interest calculator, unit converter money, unit converter chart, power unit converter, unit converter online, electricity unit converter, BMI calculator, scientific calculator, age calculator, time calculator, GPA calculator, random number generator"
 >
+  <Fragment slot="head">
+    <JsonLd data={[websiteJsonLd, organizationJsonLd, faqJsonLd]} />
+  </Fragment>
+
   <Hero>
     <Fragment slot="badge">
       <Badge>6 converter categories · 38+ calculators</Badge>
@@ -168,6 +295,191 @@ const featuredCalcs = [
             </div>
           ))
         }
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO Article -->
+  <section class="border-t border-hairline px-md py-5xl sm:px-lg">
+    <div class="mx-auto max-w-[52rem]">
+      <h2 class="text-display-lg text-ink">The Free Online Unit Converter You've Been Looking For</h2>
+
+      <div class="prose-seo mt-xl space-y-lg text-body-md text-body">
+        <p>
+          Whether you need a quick <strong>weight unit converter</strong> to switch between kilograms and pounds, a <strong>time unit converter</strong> to flip hours into seconds, or a <strong>pressure unit converter</strong> for engineering work, MeasureMinting has you covered — instantly, accurately, and for free. Our <strong>online unit converter</strong> handles dozens of measurement categories in a single place, so you never have to juggle multiple tabs or hunt for a specialised app again.
+        </p>
+
+        <h3 class="text-display-sm text-ink">What Is a Unit Converter?</h3>
+        <p>
+          A <strong>unit converter</strong> is a tool that translates a value from one measurement unit to another using a precise mathematical relationship. Instead of memorising conversion factors — how many feet are in a metre, how many watts in a horsepower, or how many pascals in a bar — you simply type a number and the result appears immediately. MeasureMinting's <strong>unit converter calculator</strong> does this live as you type, with no button to press and no page reload required.
+        </p>
+
+        <h3 class="text-display-sm text-ink">Every Measurement Category in One Place</h3>
+        <p>
+          Our <strong>unit converter online</strong> covers all the categories you need day-to-day:
+        </p>
+        <ul class="ml-lg list-disc space-y-xs">
+          <li><strong>Length</strong> — metres, feet, inches, miles, kilometres, and more.</li>
+          <li><strong>Weight &amp; Mass</strong> — the go-to <strong>weight unit converter</strong> for pounds, kilograms, grams, ounces, and tonnes.</li>
+          <li><strong>Temperature</strong> — Celsius, Fahrenheit, and Kelvin conversions at a glance.</li>
+          <li><strong>Volume</strong> — litres, gallons, millilitres, fluid ounces, and cups.</li>
+          <li><strong>Area</strong> — square metres, square feet, acres, and hectares.</li>
+          <li><strong>Speed</strong> — km/h, mph, knots, and metres per second.</li>
+          <li><strong>Time</strong> — a precise <strong>time unit converter</strong> covering nanoseconds to years.</li>
+          <li><strong>Pressure</strong> — the <strong>pressure unit converter</strong> engineers trust, supporting bar, psi, atm, and pascal.</li>
+          <li><strong>Power</strong> — our <strong>power unit converter</strong> handles watts, kilowatts, horsepower, and BTU/hr.</li>
+          <li><strong>Electricity</strong> — an <strong>electricity unit converter</strong> for volts, amperes, ohms, and kilowatt-hours.</li>
+        </ul>
+        <p>
+          Need a quick reference? Our <strong>unit converter chart</strong> pages give printable tables for every category — perfect for classrooms, workshops, and kitchens alike.
+        </p>
+
+        <h3 class="text-display-sm text-ink">Currency &amp; Money Conversions</h3>
+        <p>
+          Travelling or shopping internationally? The <strong>unit converter money</strong> section keeps exchange-rate logic separate from physical units, delivering a clean and focused experience for currency conversions alongside every other measurement type you need.
+        </p>
+
+        <h3 class="text-display-sm text-ink">38+ Free Calculators — Finance, Health, Math &amp; More</h3>
+        <p>
+          MeasureMinting isn't just a <strong>unit converter app</strong> — it's a full calculation suite. Our most-used tools include:
+        </p>
+        <ul class="ml-lg list-disc space-y-xs">
+          <li><strong>Compound Interest Calculator</strong> — see exactly how your savings or debt grow with compounding over time.</li>
+          <li><strong>BMI Calculator</strong> — calculate your Body Mass Index from height and weight in any unit system.</li>
+          <li><strong>Scientific Calculator</strong> — evaluate expressions, derivatives, and integrals right in your browser.</li>
+          <li><strong>Age Calculator</strong> — find your exact age in years, months, and days from any birthdate.</li>
+          <li><strong>Time Calculator</strong> — add, subtract, and convert durations with ease.</li>
+          <li><strong>GPA Calculator</strong> — compute weighted or unweighted grade point averages for any grading scale.</li>
+          <li><strong>Random Number Generator</strong> — generate truly random numbers within any range for games, research, or decisions.</li>
+        </ul>
+        <p>
+          Every calculator runs entirely in your browser — no sign-up, no data collection, and no ads cluttering your screen. Whether you reach for MeasureMinting as a <strong>unit converter app</strong> on your phone or a desktop tool at work, the experience is identical: fast, clean, and reliable.
+        </p>
+
+        <h3 class="text-display-sm text-ink">Why MeasureMinting Stands Out</h3>
+        <p>
+          Most unit converter tools are slow, ad-heavy, or require you to hit a "Convert" button after every input. MeasureMinting updates results <em>as you type</em>, supports bidirectional editing (change either field), and works perfectly on any screen size. Dark mode, keyboard navigation, and accessible markup are built-in — not afterthoughts. Whether you're a student checking homework, an engineer verifying specs, a cook scaling a recipe, or a traveller managing currency, MeasureMinting is the only <strong>unit converter online</strong> you'll need to bookmark.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="border-t border-hairline px-md py-5xl sm:px-lg">
+    <div class="mx-auto max-w-[52rem]">
+      <h2 class="text-display-lg text-ink">Frequently Asked Questions</h2>
+      <dl class="mt-2xl space-y-lg">
+        {[
+          {
+            q: "What are the rules for unit converter?",
+            a: "A unit converter follows one rule: every conversion uses a fixed mathematical relationship between units. Enter a value in one unit and the tool multiplies or divides it by the appropriate conversion factor to produce the equivalent in the target unit. Always ensure the units belong to the same measurement category — you cannot convert metres to kilograms because they measure different physical quantities.",
+          },
+          {
+            q: "How to use a unit converter?",
+            a: "Select the measurement category you need (such as Length or Temperature), then choose your From and To units from the dropdown menus. Type your value into either input field and the converted result appears instantly — no button press required. You can also type in the second field to reverse the conversion.",
+          },
+          {
+            q: "Why is unit conversion important?",
+            a: "Unit conversion is essential in science, engineering, cooking, travel, and everyday life. Different countries and industries use different measurement systems — the metric and imperial systems being the most common. Accurate conversion prevents costly errors in manufacturing, ensures medical dosages are correct, and helps people understand distances and temperatures expressed in unfamiliar units.",
+          },
+          {
+            q: "What are common types of conversions?",
+            a: "The most frequently performed conversions include length (metres to feet, kilometres to miles), weight and mass (kilograms to pounds), temperature (Celsius to Fahrenheit), volume (litres to gallons), area (square metres to square feet), speed (km/h to mph), time (hours to seconds), pressure (psi to bar), power (watts to horsepower), and electricity units such as volts, amperes, and kilowatt-hours.",
+          },
+          {
+            q: "What are some common mistakes in unit conversions?",
+            a: "The most common mistakes are converting between incompatible unit types (confusing mass with weight, for example), using outdated or imprecise conversion factors, forgetting that temperature conversions use formulas rather than simple multiplication, and rounding intermediate results before completing the full calculation. Always verify the unit category and use a reliable, up-to-date tool.",
+          },
+          {
+            q: "What is a unit converter?",
+            a: "A unit converter is an online tool that automatically translates a numerical value from one unit of measurement to another. It eliminates the need to memorise conversion formulas or perform manual arithmetic. MeasureMinting's unit converter covers length, weight, temperature, volume, area, speed, time, pressure, power, electricity, and more — all updating in real time as you type.",
+          },
+          {
+            q: "How accurate are the conversions?",
+            a: "All conversions on MeasureMinting use industry-standard conversion factors sourced from SI (International System of Units) definitions and widely accepted scientific references. Results are calculated with full floating-point precision and displayed to a practical number of significant figures. For everyday and professional use, the results match any scientific or engineering reference.",
+          },
+          {
+            q: "Is this conversion tool free to use?",
+            a: "Yes, MeasureMinting is completely free. There are no subscriptions, no account required, and no limits on how many conversions you can perform. Every tool on the site — unit converters and calculators alike — runs directly in your browser at no cost.",
+          },
+          {
+            q: "What unit categories are supported?",
+            a: "MeasureMinting supports conversions across length, weight and mass, temperature, volume, area, speed, time, pressure, power, electricity, and more. Visit the All Converters page for the full list of supported categories and units.",
+          },
+          {
+            q: "Do I need to install anything to use this site?",
+            a: "No installation is required. MeasureMinting runs entirely in your web browser. Simply open the site on any device — desktop, tablet, or smartphone — and start converting immediately. No app download, no plug-in, and no account creation is needed.",
+          },
+          {
+            q: "Why do my results look different from another conversion site?",
+            a: "Small differences can occur due to rounding rules, the number of decimal places displayed, or slightly different conversion factors used by different tools. MeasureMinting uses precise, SI-standard conversion factors. If you see a significant discrepancy, the other tool may be using an outdated or rounded factor.",
+          },
+        ].map(({ q, a }) => (
+          <div class="border-b border-hairline pb-lg">
+            <dt class="text-display-sm text-ink">{q}</dt>
+            <dd class="mt-sm text-body-md text-body">{a}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- Company pages -->
+  <section class="border-t border-hairline bg-canvas-soft px-md py-4xl sm:px-lg">
+    <div class="mx-auto max-w-[1400px]">
+      <h2 class="text-display-lg text-ink">More from MeasureMinting</h2>
+      <div class="mt-lg grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-4">
+        <a href="/about/">
+          <div class="flex h-full flex-col gap-sm rounded-2xl border border-hairline bg-canvas p-xl transition-all hover:shadow-level-4 hover:-translate-y-px">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-link-bg-soft text-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <div>
+              <h3 class="text-display-sm text-ink">About Us</h3>
+              <p class="mt-xs text-body-sm text-body">Learn who we are, why we built MeasureMinting, and the standards behind every conversion.</p>
+            </div>
+            <p class="mt-auto text-body-sm-strong text-link">Learn more →</p>
+          </div>
+        </a>
+
+        <a href="/contact/">
+          <div class="flex h-full flex-col gap-sm rounded-2xl border border-hairline bg-canvas p-xl transition-all hover:shadow-level-4 hover:-translate-y-px">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-link-bg-soft text-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <h3 class="text-display-sm text-ink">Contact Us</h3>
+              <p class="mt-xs text-body-sm text-body">Report a bug, suggest a new converter, or just say hello — we read every message.</p>
+            </div>
+            <p class="mt-auto text-body-sm-strong text-link">Get in touch →</p>
+          </div>
+        </a>
+
+        <a href="/privacy/">
+          <div class="flex h-full flex-col gap-sm rounded-2xl border border-hairline bg-canvas p-xl transition-all hover:shadow-level-4 hover:-translate-y-px">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-link-bg-soft text-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <h3 class="text-display-sm text-ink">Privacy Policy</h3>
+              <p class="mt-xs text-body-sm text-body">No accounts, no tracking cookies. All conversions happen in your browser — here's exactly how we handle your data.</p>
+            </div>
+            <p class="mt-auto text-body-sm-strong text-link">Read policy →</p>
+          </div>
+        </a>
+
+        <a href="/terms/">
+          <div class="flex h-full flex-col gap-sm rounded-2xl border border-hairline bg-canvas p-xl transition-all hover:shadow-level-4 hover:-translate-y-px">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-link-bg-soft text-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div>
+              <h3 class="text-display-sm text-ink">Terms & Conditions</h3>
+              <p class="mt-xs text-body-sm text-body">Understand the terms of use, accuracy disclaimers, and intellectual property rules for this site.</p>
+            </div>
+            <p class="mt-auto text-body-sm-strong text-link">Read terms →</p>
+          </div>
+        </a>
       </div>
     </div>
   </section>

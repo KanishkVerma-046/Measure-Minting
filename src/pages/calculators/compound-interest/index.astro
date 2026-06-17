@@ -14,6 +14,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="calc-card">
         <form id="ci-form">
           <div class="calc-field">
+            <label class="calc-label" for="ci-currency">Currency</label>
+            <select class="calc-select" id="ci-currency">
+              <option value="USD">USD – US Dollar ($)</option>
+              <option value="EUR">EUR – Euro (€)</option>
+              <option value="GBP">GBP – British Pound (£)</option>
+              <option value="CAD">CAD – Canadian Dollar (C$)</option>
+              <option value="AUD">AUD – Australian Dollar (A$)</option>
+              <option value="CHF">CHF – Swiss Franc (Fr.)</option>
+              <option value="JPY">JPY – Japanese Yen (¥)</option>
+              <option value="CNY">CNY – Chinese Yuan (¥)</option>
+              <option value="INR">INR – Indian Rupee (₹)</option>
+              <option value="BRL">BRL – Brazilian Real (R$)</option>
+              <option value="MXN">MXN – Mexican Peso (MX$)</option>
+              <option value="KRW">KRW – South Korean Won (₩)</option>
+              <option value="SGD">SGD – Singapore Dollar (S$)</option>
+              <option value="HKD">HKD – Hong Kong Dollar (HK$)</option>
+            </select>
+          </div>
+          <div class="calc-field">
             <label class="calc-label" for="principal">Initial Investment ($)</label>
             <input class="calc-input" id="principal" type="number" min="0" step="100" placeholder="10000">
           </div>
@@ -58,8 +77,24 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
+  const CURR_SYMBOLS: Record<string, string> = {
+    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'Fr.',
+    JPY: '¥', CNY: '¥', INR: '₹', BRL: 'R$', MXN: 'MX$', KRW: '₩',
+    SGD: 'S$', HKD: 'HK$'
+  };
+  const origLabels = new Map<Element, string>();
+  document.querySelectorAll('.calc-label').forEach(el => {
+    if (el.textContent?.includes('$')) origLabels.set(el, el.textContent!);
+  });
+  document.getElementById('ci-currency')!.addEventListener('change', () => {
+    const sym = CURR_SYMBOLS[(document.getElementById('ci-currency') as HTMLSelectElement).value] ?? '$';
+    origLabels.forEach((orig, el) => { el.textContent = orig.replace(/\$/g, sym); });
+  });
+
   document.getElementById('ci-form')!.addEventListener('submit', (e) => {
     e.preventDefault();
+    const currCode = (document.getElementById('ci-currency') as HTMLSelectElement).value;
+    const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currCode, maximumFractionDigits: 0 }).format(v);
     const P = parseFloat((document.getElementById('principal') as HTMLInputElement).value) || 0;
     const PMT = parseFloat((document.getElementById('contribution') as HTMLInputElement).value) || 0;
     const r = parseFloat((document.getElementById('annual-rate') as HTMLInputElement).value);
@@ -69,16 +104,10 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     if (!r || !years) return;
 
     const rn = r / 100 / n;
-    const periods = n * years;
-
-    // Future value of lump sum + future value of annuity (monthly contrib normalized to compound periods)
-    const FV_principal = P * Math.pow(1 + rn, periods);
     const monthlyPeriods = 12 * years;
-    // Simulate month by month for accuracy with different compound frequencies
     let balance = P;
     for (let m = 1; m <= monthlyPeriods; m++) {
       balance += PMT;
-      // Apply compound interest at each compound period that falls on this month
       const compoundsThisMonth = n / 12;
       balance *= Math.pow(1 + rn, compoundsThisMonth);
     }
@@ -88,7 +117,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const interestEarned = balance - totalInvested;
     const roi = (interestEarned / totalInvested) * 100;
 
-    const fmt = (v: number) => '$' + Math.round(v).toLocaleString('en-US');
     document.getElementById('final-balance')!.textContent = fmt(balance);
     document.getElementById('r-principal')!.textContent = fmt(P);
     document.getElementById('r-contributions')!.textContent = fmt(totalContrib);

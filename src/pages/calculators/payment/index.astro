@@ -15,6 +15,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         <p class="text-body-sm text-body mb-md">Leave one field blank to solve for it.</p>
         <form id="pay-form">
           <div class="calc-field">
+            <label class="calc-label" for="pay-currency">Currency</label>
+            <select class="calc-select" id="pay-currency">
+              <option value="USD">USD – US Dollar ($)</option>
+              <option value="EUR">EUR – Euro (€)</option>
+              <option value="GBP">GBP – British Pound (£)</option>
+              <option value="CAD">CAD – Canadian Dollar (C$)</option>
+              <option value="AUD">AUD – Australian Dollar (A$)</option>
+              <option value="CHF">CHF – Swiss Franc (Fr.)</option>
+              <option value="JPY">JPY – Japanese Yen (¥)</option>
+              <option value="CNY">CNY – Chinese Yuan (¥)</option>
+              <option value="INR">INR – Indian Rupee (₹)</option>
+              <option value="BRL">BRL – Brazilian Real (R$)</option>
+              <option value="MXN">MXN – Mexican Peso (MX$)</option>
+              <option value="KRW">KRW – South Korean Won (₩)</option>
+              <option value="SGD">SGD – Singapore Dollar (S$)</option>
+              <option value="HKD">HKD – Hong Kong Dollar (HK$)</option>
+            </select>
+          </div>
+          <div class="calc-field">
             <label class="calc-label" for="pay-principal">Loan Amount ($)</label>
             <input class="calc-input" id="pay-principal" type="number" min="0" step="500" placeholder="Leave blank to solve">
           </div>
@@ -45,8 +64,24 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
+  const CURR_SYMBOLS: Record<string, string> = {
+    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'Fr.',
+    JPY: '¥', CNY: '¥', INR: '₹', BRL: 'R$', MXN: 'MX$', KRW: '₩',
+    SGD: 'S$', HKD: 'HK$'
+  };
+  const origLabels = new Map<Element, string>();
+  document.querySelectorAll('.calc-label').forEach(el => {
+    if (el.textContent?.includes('$')) origLabels.set(el, el.textContent!);
+  });
+  document.getElementById('pay-currency')!.addEventListener('change', () => {
+    const sym = CURR_SYMBOLS[(document.getElementById('pay-currency') as HTMLSelectElement).value] ?? '$';
+    origLabels.forEach((orig, el) => { el.textContent = orig.replace(/\$/g, sym); });
+  });
+
   document.getElementById('pay-form')!.addEventListener('submit', (e) => {
     e.preventDefault();
+    const currCode = (document.getElementById('pay-currency') as HTMLSelectElement).value;
+    const fmt$ = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currCode }).format(v);
     const pVal = (document.getElementById('pay-principal') as HTMLInputElement).value;
     const rVal = (document.getElementById('pay-rate') as HTMLInputElement).value;
     const nVal = (document.getElementById('pay-months') as HTMLInputElement).value;
@@ -61,7 +96,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     if (blanks !== 1) { alert('Please leave exactly one field blank.'); return; }
 
     let resP = P!, resR = rAnn!, resN = n!, resPMT = PMT!;
-    const fmt$ = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     if (PMT === null) {
       const r = resR / 12;
@@ -73,7 +107,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       const r = resR / 12;
       resN = r === 0 ? resP / resPMT : Math.round(-Math.log(1 - resP*r/resPMT) / Math.log(1+r));
     } else if (rAnn === null) {
-      // Newton's method for rate
       let r = 0.005;
       for (let i = 0; i < 100; i++) {
         const f = resP * (r * Math.pow(1+r,resN)) / (Math.pow(1+r,resN)-1) - resPMT;

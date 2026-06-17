@@ -17,6 +17,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           <label class="flex items-center gap-xs text-body-sm cursor-pointer"><input type="radio" name="mode" value="remove" class="accent-link"> Remove tax from total</label>
         </div>
         <form id="st-form">
+          <div class="calc-field">
+            <label class="calc-label" for="st-currency">Currency</label>
+            <select class="calc-select" id="st-currency">
+              <option value="USD">USD – US Dollar ($)</option>
+              <option value="EUR">EUR – Euro (€)</option>
+              <option value="GBP">GBP – British Pound (£)</option>
+              <option value="CAD">CAD – Canadian Dollar (C$)</option>
+              <option value="AUD">AUD – Australian Dollar (A$)</option>
+              <option value="CHF">CHF – Swiss Franc (Fr.)</option>
+              <option value="JPY">JPY – Japanese Yen (¥)</option>
+              <option value="CNY">CNY – Chinese Yuan (¥)</option>
+              <option value="INR">INR – Indian Rupee (₹)</option>
+              <option value="BRL">BRL – Brazilian Real (R$)</option>
+              <option value="MXN">MXN – Mexican Peso (MX$)</option>
+              <option value="KRW">KRW – South Korean Won (₩)</option>
+              <option value="SGD">SGD – Singapore Dollar (S$)</option>
+              <option value="HKD">HKD – Hong Kong Dollar (HK$)</option>
+            </select>
+          </div>
           <div class="calc-field" id="pretax-field">
             <label class="calc-label" for="st-price">Price Before Tax ($)</label>
             <input class="calc-input" id="st-price" type="number" step="0.01" min="0" placeholder="99.99">
@@ -42,6 +61,20 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
+  const CURR_SYMBOLS: Record<string, string> = {
+    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'Fr.',
+    JPY: '¥', CNY: '¥', INR: '₹', BRL: 'R$', MXN: 'MX$', KRW: '₩',
+    SGD: 'S$', HKD: 'HK$'
+  };
+  const origLabels = new Map<Element, string>();
+  document.querySelectorAll('.calc-label').forEach(el => {
+    if (el.textContent?.includes('$')) origLabels.set(el, el.textContent!);
+  });
+  document.getElementById('st-currency')!.addEventListener('change', () => {
+    const sym = CURR_SYMBOLS[(document.getElementById('st-currency') as HTMLSelectElement).value] ?? '$';
+    origLabels.forEach((orig, el) => { el.textContent = orig.replace(/\$/g, sym); });
+  });
+
   document.querySelectorAll('input[name="mode"]').forEach(r => {
     r.addEventListener('change', (e) => {
       const isAdd = (e.target as HTMLInputElement).value === 'add';
@@ -52,6 +85,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
   document.getElementById('st-form')!.addEventListener('submit', (e) => {
     e.preventDefault();
+    const currCode = (document.getElementById('st-currency') as HTMLSelectElement).value;
+    const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currCode }).format(v);
     const mode = (document.querySelector('input[name="mode"]:checked') as HTMLInputElement).value;
     const rate = parseFloat((document.getElementById('st-rate') as HTMLInputElement).value) / 100;
     if (isNaN(rate)) return;
@@ -68,7 +103,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     }
 
     const taxAmt = postTax - preTax;
-    const fmt = (v: number) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     document.getElementById('st-pretax')!.textContent = fmt(preTax);
     document.getElementById('st-taxamt')!.textContent = fmt(taxAmt);
     document.getElementById('st-posttax')!.textContent = fmt(postTax);

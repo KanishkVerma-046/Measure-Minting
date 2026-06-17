@@ -1,17 +1,25 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import Button from "../../components/Button.astro";
 
 const path = "/about/";
 const breadcrumbItems = [
   { label: "Home", path: "/" },
   { label: "About", path },
 ];
+
+const stats = [
+  { value: "10+", label: "Converter categories" },
+  { value: "38+", label: "Free calculators" },
+  { value: "100%", label: "Browser-based" },
+  { value: "0", label: "Ads or sign-ups" },
+];
 ---
 
 <BaseLayout
-  title="About"
-  description="MeasureMinting is a fast, ad-free unit converter built for accuracy and speed."
+  title="About MeasureMinting — Free Online Unit Converter"
+  description="Learn about MeasureMinting — a fast, accurate, ad-free unit converter and calculator suite built to get out of your way."
   path={path}
 >
   <section class="px-md py-4xl sm:px-lg">
@@ -22,18 +30,58 @@ const breadcrumbItems = [
 
       <h1 class="text-display-xl text-ink text-balance">About MeasureMinting</h1>
       <p class="mt-md text-body-lg text-body text-pretty">
-        MeasureMinting is a unit converter built around one idea: the tool should get out of your way. Type a
-        number, pick your units, and get an accurate answer instantly — no ads, no pop-ups, no page reloads.
+        MeasureMinting is a unit converter and calculator suite built around one idea: the tool should get out of your way. Type a number, pick your units, and get an accurate answer instantly — no ads, no pop-ups, no page reloads.
       </p>
-      <p class="mt-md text-body-md text-body">
-        Every conversion factor used on this site is sourced from internationally defined standards (SI, US
-        customary, and imperial units). Results are computed live in your browser using the same conversion
-        engine that generates every static page on the site, so the math you see is always consistent.
-      </p>
-      <p class="mt-md text-body-md text-body">
-        We’re starting with six core categories — Length, Weight &amp; Mass, Temperature, Volume, Area, and Speed —
-        and adding more over time.
-      </p>
+
+      <!-- Stats -->
+      <div class="mt-2xl grid grid-cols-2 gap-md sm:grid-cols-4">
+        {stats.map(({ value, label }) => (
+          <div class="rounded-xl border border-hairline bg-canvas px-md py-lg text-center">
+            <p class="text-display-lg text-link">{value}</p>
+            <p class="mt-xxs text-body-sm text-body">{label}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="prose-seo mt-2xl space-y-2xl text-body-md text-body">
+
+        <div>
+          <h2 class="text-display-md text-ink">Why we built it</h2>
+          <p class="mt-sm">
+            Most unit converter sites are slow, cluttered with ads, and require you to click a "Convert" button after every input. We found that frustrating, so we built something better: a tool that updates results live as you type, supports editing in either direction, and works perfectly on every screen size.
+          </p>
+          <p class="mt-sm">
+            MeasureMinting runs entirely in your browser. There is no back-end processing your inputs, no account to create, and no data leaving your device. Every conversion happens instantly, locally, and privately.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Our conversion standards</h2>
+          <p class="mt-sm">
+            Every conversion factor used on MeasureMinting is sourced from internationally defined standards — the International System of Units (SI), US customary units, and imperial units as defined by the international yard and pound agreement. We do not rely on approximations where exact definitions exist. The same conversion engine that powers the live tool generates every static page on the site, so the math is always consistent.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">What's on the site</h2>
+          <p class="mt-sm">
+            Beyond unit conversion, MeasureMinting offers 38+ free calculators across finance, health, math, and everyday use — including a mortgage calculator, BMI calculator, compound interest calculator, scientific calculator, and much more. All tools are free, require no installation, and work on any device.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-display-md text-ink">Accessibility & design</h2>
+          <p class="mt-sm">
+            Dark mode, full keyboard navigation, and semantic accessible markup are built-in from the ground up. We test across screen sizes and aim to meet WCAG 2.1 AA standards throughout the site.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="mt-2xl flex flex-wrap gap-sm">
+        <Button href="/all-converters/" variant="primary">Browse converters</Button>
+        <Button href="/contact/" variant="secondary">Get in touch</Button>
+      </div>
     </div>
   </section>
 </BaseLayout>

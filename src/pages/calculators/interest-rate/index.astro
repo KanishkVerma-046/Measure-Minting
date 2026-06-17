@@ -14,6 +14,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="calc-card">
         <form id="ir-form">
           <div class="calc-field">
+            <label class="calc-label" for="ir-currency">Currency</label>
+            <select class="calc-select" id="ir-currency">
+              <option value="USD">USD – US Dollar ($)</option>
+              <option value="EUR">EUR – Euro (€)</option>
+              <option value="GBP">GBP – British Pound (£)</option>
+              <option value="CAD">CAD – Canadian Dollar (C$)</option>
+              <option value="AUD">AUD – Australian Dollar (A$)</option>
+              <option value="CHF">CHF – Swiss Franc (Fr.)</option>
+              <option value="JPY">JPY – Japanese Yen (¥)</option>
+              <option value="CNY">CNY – Chinese Yuan (¥)</option>
+              <option value="INR">INR – Indian Rupee (₹)</option>
+              <option value="BRL">BRL – Brazilian Real (R$)</option>
+              <option value="MXN">MXN – Mexican Peso (MX$)</option>
+              <option value="KRW">KRW – South Korean Won (₩)</option>
+              <option value="SGD">SGD – Singapore Dollar (S$)</option>
+              <option value="HKD">HKD – Hong Kong Dollar (HK$)</option>
+            </select>
+          </div>
+          <div class="calc-field">
             <label class="calc-label" for="ir-principal">Loan Amount ($)</label>
             <input class="calc-input" id="ir-principal" type="number" min="0" step="500" placeholder="20000">
           </div>
@@ -42,15 +61,30 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
+  const CURR_SYMBOLS: Record<string, string> = {
+    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'Fr.',
+    JPY: '¥', CNY: '¥', INR: '₹', BRL: 'R$', MXN: 'MX$', KRW: '₩',
+    SGD: 'S$', HKD: 'HK$'
+  };
+  const origLabels = new Map<Element, string>();
+  document.querySelectorAll('.calc-label').forEach(el => {
+    if (el.textContent?.includes('$')) origLabels.set(el, el.textContent!);
+  });
+  document.getElementById('ir-currency')!.addEventListener('change', () => {
+    const sym = CURR_SYMBOLS[(document.getElementById('ir-currency') as HTMLSelectElement).value] ?? '$';
+    origLabels.forEach((orig, el) => { el.textContent = orig.replace(/\$/g, sym); });
+  });
+
   document.getElementById('ir-form')!.addEventListener('submit', (e) => {
     e.preventDefault();
+    const currCode = (document.getElementById('ir-currency') as HTMLSelectElement).value;
+    const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currCode }).format(v);
     const P = parseFloat((document.getElementById('ir-principal') as HTMLInputElement).value);
     const PMT = parseFloat((document.getElementById('ir-payment') as HTMLInputElement).value);
     const n = parseInt((document.getElementById('ir-months') as HTMLInputElement).value);
 
     if (!P || !PMT || !n) return;
 
-    // Newton's method to find monthly rate
     let r = 0.005;
     for (let i = 0; i < 200; i++) {
       const pow = Math.pow(1 + r, n);
@@ -67,8 +101,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
     document.getElementById('ir-rate')!.textContent = annualRate.toFixed(3) + '%';
     document.getElementById('ir-monthly-rate')!.textContent = (r * 100).toFixed(4) + '%';
-    document.getElementById('ir-total')!.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('ir-interest')!.textContent = '$' + interest.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('ir-total')!.textContent = fmt(total);
+    document.getElementById('ir-interest')!.textContent = fmt(interest);
 
     const result = document.getElementById('ir-result')!;
     result.classList.remove('hidden');

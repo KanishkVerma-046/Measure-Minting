@@ -14,6 +14,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="calc-card">
         <form id="amort-form">
           <div class="calc-field">
+            <label class="calc-label" for="am-currency">Currency</label>
+            <select class="calc-select" id="am-currency">
+              <option value="USD">USD – US Dollar ($)</option>
+              <option value="EUR">EUR – Euro (€)</option>
+              <option value="GBP">GBP – British Pound (£)</option>
+              <option value="CAD">CAD – Canadian Dollar (C$)</option>
+              <option value="AUD">AUD – Australian Dollar (A$)</option>
+              <option value="CHF">CHF – Swiss Franc (Fr.)</option>
+              <option value="JPY">JPY – Japanese Yen (¥)</option>
+              <option value="CNY">CNY – Chinese Yuan (¥)</option>
+              <option value="INR">INR – Indian Rupee (₹)</option>
+              <option value="BRL">BRL – Brazilian Real (R$)</option>
+              <option value="MXN">MXN – Mexican Peso (MX$)</option>
+              <option value="KRW">KRW – South Korean Won (₩)</option>
+              <option value="SGD">SGD – Singapore Dollar (S$)</option>
+              <option value="HKD">HKD – Hong Kong Dollar (HK$)</option>
+            </select>
+          </div>
+          <div class="calc-field">
             <label class="calc-label" for="am-principal">Loan Amount ($)</label>
             <input class="calc-input" id="am-principal" type="number" min="0" step="1000" placeholder="200000">
           </div>
@@ -54,8 +73,24 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
+  const CURR_SYMBOLS: Record<string, string> = {
+    USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'Fr.',
+    JPY: '¥', CNY: '¥', INR: '₹', BRL: 'R$', MXN: 'MX$', KRW: '₩',
+    SGD: 'S$', HKD: 'HK$'
+  };
+  const origLabels = new Map<Element, string>();
+  document.querySelectorAll('.calc-label').forEach(el => {
+    if (el.textContent?.includes('$')) origLabels.set(el, el.textContent!);
+  });
+  document.getElementById('am-currency')!.addEventListener('change', () => {
+    const sym = CURR_SYMBOLS[(document.getElementById('am-currency') as HTMLSelectElement).value] ?? '$';
+    origLabels.forEach((orig, el) => { el.textContent = orig.replace(/\$/g, sym); });
+  });
+
   document.getElementById('amort-form')!.addEventListener('submit', (e) => {
     e.preventDefault();
+    const currCode = (document.getElementById('am-currency') as HTMLSelectElement).value;
+    const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currCode }).format(v);
     const P = parseFloat((document.getElementById('am-principal') as HTMLInputElement).value);
     const rate = parseFloat((document.getElementById('am-rate') as HTMLInputElement).value);
     const years = parseInt((document.getElementById('am-term') as HTMLInputElement).value);
@@ -66,9 +101,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const n = years * 12;
     const payment = r === 0 ? P / n : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
 
-    document.getElementById('am-monthly')!.textContent = '$' + payment.toFixed(2);
-    document.getElementById('am-total')!.textContent = '$' + (payment * n).toFixed(2);
-    document.getElementById('am-interest')!.textContent = '$' + (payment * n - P).toFixed(2);
+    document.getElementById('am-monthly')!.textContent = fmt(payment);
+    document.getElementById('am-total')!.textContent = fmt(payment * n);
+    document.getElementById('am-interest')!.textContent = fmt(payment * n - P);
 
     const tbody = document.getElementById('amort-tbody')!;
     tbody.innerHTML = '';
@@ -82,10 +117,10 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         tr.className = 'border-b border-hairline hover:bg-canvas-soft';
         tr.innerHTML = `
           <td class="px-sm py-xs text-mute">${i}</td>
-          <td class="px-sm py-xs text-right">$${payment.toFixed(2)}</td>
-          <td class="px-sm py-xs text-right" style="color:var(--color-success)">$${principalPmt.toFixed(2)}</td>
-          <td class="px-sm py-xs text-right" style="color:var(--color-error)">$${interestPmt.toFixed(2)}</td>
-          <td class="px-sm py-xs text-right font-medium">$${balance.toFixed(2)}</td>
+          <td class="px-sm py-xs text-right">${fmt(payment)}</td>
+          <td class="px-sm py-xs text-right" style="color:var(--color-success)">${fmt(principalPmt)}</td>
+          <td class="px-sm py-xs text-right" style="color:var(--color-error)">${fmt(interestPmt)}</td>
+          <td class="px-sm py-xs text-right font-medium">${fmt(balance)}</td>
         `;
         tbody.appendChild(tr);
       }

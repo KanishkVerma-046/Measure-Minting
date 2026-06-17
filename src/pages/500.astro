@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/Button.astro";
+---
+
+<BaseLayout title="Server Error" description="Something went wrong on our end. Please try again." path="/500/">
+  <section class="px-md py-section text-center sm:px-lg">
+    <div class="mx-auto max-w-[36rem]">
+      <p class="text-caption-mono uppercase text-mute">500</p>
+      <h1 class="mt-xs text-display-xl text-ink text-balance">Something went wrong on our end.</h1>
+      <p class="mt-sm text-body-lg text-body text-pretty">
+        We hit an unexpected error. This is our fault, not yours — please try again in a moment.
+      </p>
+      <div class="mt-lg flex flex-wrap items-center justify-center gap-sm">
+        <Button href="/" variant="primary">Go home</Button>
+        <Button href="/contact/" variant="secondary">Report the issue</Button>
+      </div>
+      <p class="mt-2xl text-body-sm text-mute">
+        If the problem persists, <a href="/contact/" class="text-link hover:underline">let us know</a> and we'll look into it.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
