@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 
 const canonicalUrl = `${SITE_URL}${path}`;
-const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+const fullTitle = SITE_NAME;
 const ogImageUrl = `${SITE_URL}${ogImage}`;
 
 const defaultKeywords =
