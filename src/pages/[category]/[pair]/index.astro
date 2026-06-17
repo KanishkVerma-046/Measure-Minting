@@ -71,13 +71,13 @@ const relatedPairs = category.popularPairs
     <Fragment slot="title">{title}</Fragment>
     <Fragment slot="subtitle">{description}</Fragment>
 
-    <Card variant="marketing-large" class="mx-auto max-w-2xl text-left">
+    <Card variant="marketing-large" class="mx-auto max-w-[42rem] text-left">
       <UnitConverter categoryId={category.id} fromUnitId={fromUnit.id} toUnitId={toUnit.id} value={1} />
     </Card>
   </Hero>
 
   <section class="px-md py-4xl sm:px-lg">
-    <div class="mx-auto max-w-2xl">
+    <div class="mx-auto max-w-[42rem]">
       <div class="mb-lg">
         <Breadcrumbs items={breadcrumbItems} />
       </div>

@@ -39,7 +39,7 @@ const defaultTo = category.units[1] ?? category.units[0];
     <Fragment slot="title">{category.label} Converter</Fragment>
     <Fragment slot="subtitle">{category.description}</Fragment>
 
-    <Card variant="marketing-large" class="mx-auto max-w-2xl text-left">
+    <Card variant="marketing-large" class="mx-auto max-w-[42rem] text-left">
       <UnitConverter categoryId={category.id} fromUnitId={defaultFrom.id} toUnitId={defaultTo.id} value={1} />
     </Card>
   </Hero>
