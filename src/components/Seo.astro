@@ -23,7 +23,7 @@ const {
 } = Astro.props;
 
 const canonicalUrl = `${SITE_URL}${path}`;
-const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} | ${SITE_NAME}`;
+const fullTitle = title.startsWith(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
 const ogImageUrl = ogImage ? `${SITE_URL}${ogImage}` : `${SITE_URL}/favicon-96x96.png`;
 
 const defaultKeywords =
