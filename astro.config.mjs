@@ -17,7 +17,10 @@ export default defineConfig({
 
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/500'),
+      filter: (page) =>
+        !page.includes('/500') &&
+        !page.includes('/404') &&
+        !page.includes('/sitemap/'),
 
       serialize(item) {
         const path = item.url.replace(SITE, '');

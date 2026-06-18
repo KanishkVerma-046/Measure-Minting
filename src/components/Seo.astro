@@ -6,12 +6,10 @@ interface Props {
   description: string;
   /** Absolute path, e.g. "/length/meters-to-feet/" */
   path: string;
-  /** Optional keywords override */
   keywords?: string;
-  /** Optional OG image path, defaults to /og-image.png */
   ogImage?: string;
-  /** Page type for og:type */
   ogType?: "website" | "article";
+  noindex?: boolean;
 }
 
 const {
@@ -19,13 +17,14 @@ const {
   description,
   path,
   keywords,
-  ogImage = "/og-image.png",
+  ogImage,
   ogType = "website",
+  noindex = false,
 } = Astro.props;
 
 const canonicalUrl = `${SITE_URL}${path}`;
-const fullTitle = SITE_NAME;
-const ogImageUrl = `${SITE_URL}${ogImage}`;
+const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} | ${SITE_NAME}`;
+const ogImageUrl = ogImage ? `${SITE_URL}${ogImage}` : `${SITE_URL}/favicon-96x96.png`;
 
 const defaultKeywords =
   "unit converter, online unit converter, unit converter calculator, unit converter app, weight unit converter, time unit converter, pressure unit converter, compound interest calculator, unit converter money, unit converter chart, power unit converter, unit converter online, electricity unit converter, BMI calculator, scientific calculator, age calculator, time calculator, GPA calculator, random number generator";
@@ -55,6 +54,6 @@ const defaultKeywords =
 <meta name="twitter:image" content={ogImageUrl} />
 <meta name="twitter:image:alt" content={`${SITE_NAME} — Free Online Unit Converter & Calculators`} />
 
-<!-- Additional SEO signals -->
-<meta name="robots" content="index, follow" />
+<!-- Indexing directive -->
+<meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
 <meta name="author" content={SITE_NAME} />

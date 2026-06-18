@@ -11,9 +11,10 @@ interface Props {
   keywords?: string;
   ogImage?: string;
   ogType?: "website" | "article";
+  noindex?: boolean;
 }
 
-const { title, description, path, keywords, ogImage, ogType } = Astro.props;
+const { title, description, path, keywords, ogImage, ogType, noindex } = Astro.props;
 ---
 
 <!doctype html>
@@ -36,11 +37,11 @@ const { title, description, path, keywords, ogImage, ogType } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="UnitConvert" />
+    <meta name="apple-mobile-web-app-title" content="MeasureMinting" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/Geist-Variable.woff2" crossorigin="anonymous" />
     <meta name="generator" content={Astro.generator} />
-    <Seo title={title} description={description} path={path} keywords={keywords} ogImage={ogImage} ogType={ogType} />
+    <Seo title={title} description={description} path={path} keywords={keywords} ogImage={ogImage} ogType={ogType} noindex={noindex} />
     <slot name="head" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-PH05G42P2J"></script>

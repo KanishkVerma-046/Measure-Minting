@@ -3,7 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/Button.astro";
 ---
 
-<BaseLayout title="Server Error" description="Something went wrong on our end. Please try again." path="/500/">
+<BaseLayout title="Server Error" description="Something went wrong on our end. Please try again." path="/500/" noindex={true}>
   <section class="px-md py-section text-center sm:px-lg">
     <div class="mx-auto max-w-[36rem]">
       <p class="text-caption-mono uppercase text-mute">500</p>
