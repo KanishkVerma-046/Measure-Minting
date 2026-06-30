@@ -3,4 +3,88 @@ Allow: /
 Disallow: /404/
 Disallow: /500/
 
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# Anthropic
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+# Google AI
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Meta
+User-agent: FacebookBot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Apple
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Microsoft / Bing
+User-agent: Bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+# Common Crawl (used for AI training datasets)
+User-agent: CCBot
+Allow: /
+
+# Amazon
+User-agent: Amazonbot
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# AI2 / Allen Institute
+User-agent: AI2Bot
+Allow: /
+
+# You.com
+User-agent: YouBot
+Allow: /
+
+# Diffbot
+User-agent: Diffbot
+Allow: /
+
+# ByteDance
+User-agent: Bytespider
+Allow: /
+
+# Timpi
+User-agent: Timpibot
+Allow: /
+
 Sitemap: https://unitconverterszone.com/sitemap-index.xml
