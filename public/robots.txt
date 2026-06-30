@@ -1,90 +1,79 @@
+# All crawlers — full access except error pages
 User-agent: *
 Allow: /
 Disallow: /404/
 Disallow: /500/
 
-# OpenAI
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-# Anthropic
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-# Google AI
-User-agent: Google-Extended
-Allow: /
-
+# ── Search engines ────────────────────────────────────────────────────────────
 User-agent: Googlebot
 Allow: /
 
-# Perplexity
-User-agent: PerplexityBot
-Allow: /
-
-# Meta
-User-agent: FacebookBot
-Allow: /
-
-User-agent: Meta-ExternalAgent
-Allow: /
-
-# Apple
-User-agent: Applebot
-Allow: /
-
-User-agent: Applebot-Extended
-Allow: /
-
-# Microsoft / Bing
 User-agent: Bingbot
 Allow: /
 
 User-agent: msnbot
 Allow: /
 
-# Common Crawl (used for AI training datasets)
-User-agent: CCBot
+User-agent: Applebot
 Allow: /
 
-# Amazon
-User-agent: Amazonbot
+User-agent: FacebookBot
 Allow: /
 
-# Cohere
-User-agent: cohere-ai
+# ── AI assistants / search (bring traffic — allowed) ─────────────────────────
+User-agent: OAI-SearchBot
 Allow: /
 
-# AI2 / Allen Institute
-User-agent: AI2Bot
+User-agent: ChatGPT-User
 Allow: /
 
-# You.com
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
 User-agent: YouBot
 Allow: /
 
-# Diffbot
+User-agent: Applebot-Extended
+Allow: /
+
 User-agent: Diffbot
 Allow: /
 
-# ByteDance
-User-agent: Bytespider
+User-agent: cohere-ai
 Allow: /
 
-# Timpi
+User-agent: AI2Bot
+Allow: /
+
 User-agent: Timpibot
 Allow: /
+
+# ── AI training crawlers (blocked) ───────────────────────────────────────────
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
 
 Sitemap: https://unitconverterszone.com/sitemap-index.xml
